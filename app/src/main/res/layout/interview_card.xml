@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <TableRow
+        android:id="@+id/tableRowInterview"
+        android:layout_width="match_parent"
+        android:layout_height="84dp"
+        android:background="#07373737"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.024">
+
+        <ImageView
+            android:id="@+id/interviewImage"
+            android:layout_width="83dp"
+            android:layout_height="83dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/interviewNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="TextView"
+                android:textColor="#353535"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/interviewTypeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="TextView"
+                android:textColor="#353535" />
+
+            <TextView
+                android:id="@+id/interviewWhoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="TextView"
+                android:textColor="#353535" />
+
+            <TextView
+                android:id="@+id/interviewTimeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="TextView"
+                android:textColor="#353535" />
+
+        </LinearLayout>
+    </TableRow>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
