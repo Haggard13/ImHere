@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
+    //База данных приложения
+    //Готовы базы данных паролей(если не выйдет с ЛК) и база данных с координатами некоторых институтов
     public DataBaseHelper(Context context) {
         super(context, "imHereDataBase", null, 1);
     }
@@ -18,13 +20,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     String[] institutions = new String[] { "IRIT-RTF","GUK","TEPLOFAK","VSHEM","STROYFAK","HIMFAK" };
     double[] latitube = new double[] { 56.840751353604674, 56.843914249505055, 56.8424766026804, 56.843110347677786, 56.84516994481896, 56.84218319858506 };
     double[] longitube = new double[] { 60.650839805603034, 60.65374732017518, 60.655345916748054, 60.65316796302796, 60.65071105957032, 60.649048089981086 };
-
-    String[] name = new String[] { "Программирование", "Программирование", "Алгебра и геометрия", "Алгебра и геометрия", "Математический анализ", "Математический анализ", "Английский язык" };
-    String[] type = new String[] { "Практика", "Практика", "Лекция", "Практика", "Лекция", "Практика", "Практика" };
-    String[] auditory = new String[] { "Р-125", "Р-125", "ГУК-404", "ГУК-404", "И-306", "И-106", "Р-129"};
-    String[] lecturer = new String[] {"Чирышев Ю.В.", "Чирышев Ю.В.", "Борич М.А.", "Борич М.А.", "Рыжкова Н.Г.", "Рыжкова Н.Г.", "Чернова О.В."};
-    String[] time = new String[] { "8:30", "10:15", "12:00", "14:15", "16:00", "17:45", "19:30" };
-    String[] inst = new String[] { "IRIT-RTF", "IRIT-RTF", "GUK", "GUK", "VSHEM", "VSHEM", "IRIT-RTF" };
 
     @Override
     public void onCreate(SQLiteDatabase db) {

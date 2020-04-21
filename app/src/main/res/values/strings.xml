@@ -4,6 +4,9 @@
     <string name="provider_network">Network</string>
     <string name="location_settings">Location settings</string>
     <string name="title_activity_login">Вход</string>
-    <string name="my_password">Elzahaggard13@</string>
-    <string name="my_login">strontium2001@mail.ru</string>
+    <string name="attribute_name_name">textName</string>
+    <string name="attribute_name_type">textType</string>
+    <string name="attribute_name_who">textWho</string>
+    <string name="attribute_name_time">textTime</string>
+    <string name="attribute_name_img">image</string>
 </resources>
