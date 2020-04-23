@@ -1,6 +1,7 @@
 package com.example.imhere
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,15 +10,14 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
-import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import android.widget.TabHost.TabSpec
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import kotlinx.coroutines.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     var time = arrayOf("12:00", "не ограничено", "12:00", "не ограничено", "12:00", "не ограничено", "12:00", "12:00")
 
     //endregion
-    //region Field Declaration
+    //region Property Declaration
+    var progressBar: ProgressBar? = null
     var listViewInterview: ListView? = null
     lateinit var checkButton: Button
     lateinit var exitButton: Button
@@ -44,16 +45,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     var locationManager: LocationManager? = null
     var locationStudent: Location? = null
     var locationRTF: Location? = null
-    var locationListener: LocationListener = object : LocationListener {
+    var requestLocationUpdateMade = false
+    private var locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             locationStudent = location
         }
 
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {
-            if (ActivityCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return
-            }
+            if (ActivityCompat.checkSelfPermission(baseContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
             locationManager!!.getLastKnownLocation(provider)
         }
 
@@ -66,7 +66,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //region Field Initializing
+        //region Property Initializing
+        progressBar = findViewById(R.id.progressBar)
         checkButton = findViewById(R.id.checkButton) //Инициализация основных View.
         exitButton = findViewById(R.id.exitButton)
         listViewInterview = findViewById(R.id.listViewInteview)
@@ -80,21 +81,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         lecturerText = findViewById(R.id.lecturerText)
         timeText = findViewById(R.id.timeText)
         //endregion
-        checkButton.setOnClickListener (this)
+        checkButton.setOnClickListener(this)
         exitButton.setOnClickListener(this)
+        progressBar!!.visibility = View.INVISIBLE
 
         //region Location Block
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationRTF = Location("locationManager")
-        locationRTF!!.latitude = 56.840750
-        locationRTF!!.longitude = 60.650750
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        locationRTF!!.apply {
+            latitude = 56.840750
+            longitude = 60.650750
         }
+        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
-            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
-        }
+            locationManager!!.apply {
+                requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
+                requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
+            }
+            requestLocationUpdateMade = true
+        } else ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         //endregion
         //region WiFi Block
         val wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -104,35 +109,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         tabHostCreate()
         listViewCreate()
         startActivity(Intent(this, PreviewActivity::class.java)) //Запуск превью
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
-        if (sp.contains("button_lock") && sp.getBoolean("button_lock", true)) {
-            val mt = ButtonLockTask()
-            mt.execute()
-        }
-        val ed = sp.edit()
-        ed.putBoolean("task", false)
-        ed.apply()
-    }
-
+    @SuppressLint("ResourceAsColor")
     override fun onClick(v: View) {
         when (v.id) {
             R.id.checkButton -> {
-                if (wifiInfo == null) {
-                    Toast.makeText(this, "Нет подключения", Toast.LENGTH_LONG).show()
-                    return
-                }
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-                    return
-                }
-                if (locationStudent != null && locationStudent!!.distanceTo(locationRTF) > 100) Toast.makeText(this, "СРОЧНО НА ПАРУ", Toast.LENGTH_LONG).show() else if (locationStudent != null) Toast.makeText(this, "ЗНАНИЕ - СИЛА", Toast.LENGTH_LONG).show()
-                locationText!!.text = formatLocation(locationStudent)
-                wifiText!!.text = wifiInfo!!.ssid
-            }
+                GlobalScope.launch(Dispatchers.Main) {
+                    if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+                        return@launch
+                    }
+                    if (!requestLocationUpdateMade) makeRequestLocationUpdate()
+                    progressBar!!.visibility = View.VISIBLE
+                    checkButton.isEnabled = false
+                    withContext(Dispatchers.IO){ while(locationStudent == null) delay(50) }
+                    wifiInfo ?: let {
+                        Toast.makeText(this@MainActivity, "Нет подключения", Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                             ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+                             return@launch
+                         }
+                    if (locationStudent!!.distanceTo(locationRTF) > 100)
+                        Toast.makeText(this@MainActivity, "СРОЧНО НА ПАРУ", Toast.LENGTH_LONG).show()
+                    else Toast.makeText(this@MainActivity, "ЗНАНИЕ - СИЛА", Toast.LENGTH_LONG).show()
+                    locationText!!.text = formatLocation(locationStudent)
+                    wifiText!!.text = wifiInfo!!.ssid
+                    progressBar!!.visibility = View.INVISIBLE
+                    checkButton.isEnabled = true
+
+                    }
+                 }
             R.id.exitButton -> {
                 val sh = getSharedPreferences("authentication", Context.MODE_PRIVATE)
                 val e = sh.edit()
@@ -184,7 +194,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         listViewInterview!!.adapter = SimpleAdapter(this, data, R.layout.interview_card, from, to)
     }
 
-    fun classCardCreate() {
+    private fun classCardCreate() {
         classNameText!!.text = "Математика"
         classNumberText!!.text = "3"
         classTypeText!!.text = "Лекция"
@@ -199,28 +209,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return if (location == null) "" else String.format("lat = %1$.6f, lon = %2$.6f", location.latitude, location.longitude)
     }
 
-    private inner class ButtonLockTask : AsyncTask<Void?, Void?, Void?>() {
-        override fun onPreExecute() {
-            super.onPreExecute()
-            checkButton!!.setBackgroundColor(resources.getColor(R.color.colorOff))
-            checkButton!!.isEnabled = false
+    @SuppressLint("MissingPermission")
+    private fun makeRequestLocationUpdate(){
+        locationManager!!.apply {
+            requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
+            requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
         }
-
-        override fun doInBackground(vararg params: Void?): Void? {
-            while (locationStudent == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(1)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-            }
-            return null
-        }
-
-        override fun onPostExecute(result: Void?) {
-            super.onPostExecute(result)
-            checkButton!!.setBackgroundColor(resources.getColor(R.color.colorOn))
-            checkButton!!.isEnabled = true
-        }
-    } //endregion
+        requestLocationUpdateMade = true
+    }
+    //endregion
 }

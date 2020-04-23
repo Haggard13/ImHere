@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var loginButton: Button
-    var loginText: EditText? = null
-    var passwordText: EditText? = null
+    private var loginText: EditText? = null
+    private var passwordText: EditText? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -45,7 +45,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
         val ed = sp.edit()
         ed.putBoolean("authentication", true)
-        ed.putBoolean("button_lock", true)
         ed.apply()
         super.finish()
     }
