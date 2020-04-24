@@ -135,11 +135,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                  }
             R.id.exitButton -> {
-                val sh = getSharedPreferences("authentication", Context.MODE_PRIVATE)
+                startActivity(Intent(this, AddInterviewActivity::class.java))
+                /*val sh = getSharedPreferences("authentication", Context.MODE_PRIVATE)
                 val e = sh.edit()
                 e.putBoolean("authentication", false)
                 e.apply()
-                startActivity(Intent(this, LoginActivity::class.java))
+                startActivity(Intent(this, LoginActivity::class.java))*/
             }
         }
     }

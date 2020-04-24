@@ -26,7 +26,7 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
         //region Property Initializing
         editTextReference = findViewById(R.id.editTextReference)
         switchAllStudents = findViewById(R.id.switchAllStudents)
-        spinnerCourses = findViewById(R.id.switchAllStudents)
+        spinnerCourses = findViewById(R.id.spinnerCourses)
         spinnerInstitution = findViewById(R.id.spinnerInstitutions)
         spinnerFormRefund = findViewById(R.id.spinnerFormRefund)
         spinnerStudentsUnion = findViewById(R.id.spinnerStudentsUnion)

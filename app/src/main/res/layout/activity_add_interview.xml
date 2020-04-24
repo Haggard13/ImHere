@@ -4,46 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
-
-    <EditText
-        android:id="@+id/editTextReference"
-        android:layout_width="356dp"
-        android:layout_height="46dp"
-        android:background="#ECECEC"
-        android:ems="10"
-        android:hint="Вставьте ссылку на Google Forms"
-        android:inputType="textPersonName"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:textColor="#101010"
-        android:textColorHint="#A3A3A3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.49"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.086" />
-
-    <Switch
-        android:id="@+id/switchAllStudents"
-        android:layout_width="377dp"
-        android:layout_height="24dp"
-        android:checked="true"
-        android:shadowColor="#FFFFFF"
-        android:text="Опрос для всех студентов"
-        android:textColor="#171717"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.21" />
+    android:background="#FFFFFF"
+    tools:context=".AddInterviewActivity">
 
     <Spinner
         android:id="@+id/spinnerInstitutions"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_width="330dp"
+        android:layout_height="25dp"
         android:entries="@array/institutions"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,34 +20,37 @@
 
     <Spinner
         android:id="@+id/spinnerFormRefund"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_width="330dp"
+        android:layout_height="25dp"
         android:entries="@array/refund_form"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.469" />
 
     <Spinner
         android:id="@+id/spinnerCourses"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_width="330dp"
+        android:layout_height="25dp"
         android:entries="@array/courses"
         android:saveEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
 
     <Spinner
         android:id="@+id/spinnerStudentsUnion"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_width="330dp"
+        android:layout_height="25dp"
         android:entries="@array/students_union"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.552" />
@@ -90,11 +60,46 @@
         android:layout_width="91dp"
         android:layout_height="34dp"
         android:background="#00d9ff"
-        android:text="Добавить"
+        android:text="@string/add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.959" />
+
+    <EditText
+        android:id="@+id/editTextReference"
+        android:layout_width="293dp"
+        android:layout_height="46dp"
+        android:background="#ECECEC"
+        android:hint="@string/google_forms"
+        android:inputType="textWebEditText"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="#101010"
+        android:textColorHint="#A3A3A3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.086" />
+
+    <Switch
+        android:id="@+id/switchAllStudents"
+        android:layout_width="309dp"
+        android:layout_height="24dp"
+        android:checked="true"
+        android:password="false"
+        android:shadowColor="#FFFFFF"
+        android:text="@string/interview_all"
+        android:textColor="#171717"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.208" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

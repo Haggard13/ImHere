@@ -9,6 +9,10 @@
     <string name="attribute_name_who">textWho</string>
     <string name="attribute_name_time">textTime</string>
     <string name="attribute_name_img">image</string>
+    <string name="google_forms">Вставьте ссылку на Google Forms</string>
+    <string name="interview_all">Опрос для всех студентов</string>
+    <string name="add">Добавить</string>
+    <string name="by_eh13">by eh13</string>
     <string-array name="courses">
         <item>1</item>
         <item>2</item>
