@@ -6,21 +6,8 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="91dp"
-        android:layout_height="34dp"
-        android:background="#00d9ff"
-        android:text="Добавить"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.959" />
-
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/editTextReference"
         android:layout_width="356dp"
         android:layout_height="46dp"
         android:background="#ECECEC"
@@ -38,13 +25,76 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.086" />
 
+    <Switch
+        android:id="@+id/switchAllStudents"
+        android:layout_width="377dp"
+        android:layout_height="24dp"
+        android:checked="true"
+        android:shadowColor="#FFFFFF"
+        android:text="Опрос для всех студентов"
+        android:textColor="#171717"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.21" />
+
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/spinnerInstitutions"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
+        android:entries="@array/institutions"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.209" />
+        app:layout_constraintVertical_bias="0.384" />
+
+    <Spinner
+        android:id="@+id/spinnerFormRefund"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/refund_form"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.469" />
+
+    <Spinner
+        android:id="@+id/spinnerCourses"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/courses"
+        android:saveEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <Spinner
+        android:id="@+id/spinnerStudentsUnion"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/students_union"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.552" />
+
+    <Button
+        android:id="@+id/buttonAddInterview"
+        android:layout_width="91dp"
+        android:layout_height="34dp"
+        android:background="#00d9ff"
+        android:text="Добавить"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.959" />
 </androidx.constraintlayout.widget.ConstraintLayout>

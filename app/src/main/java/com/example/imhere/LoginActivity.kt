@@ -49,5 +49,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         super.finish()
     }
 
-    override fun onBackPressed() {}
+    override fun onBackPressed() {
+    }
 }

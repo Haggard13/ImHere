@@ -29,10 +29,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     //endregion
     //region Property Declaration
-    var progressBar: ProgressBar? = null
+    private var progressBar: ProgressBar? = null
     var listViewInterview: ListView? = null
-    lateinit var checkButton: Button
-    lateinit var exitButton: Button
+    private lateinit var checkButton: Button
+    private lateinit var exitButton: Button
     var locationText: TextView? = null
     var wifiText: TextView? = null
     var classImage: ImageView? = null
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         override fun onProviderDisabled(provider: String) {}
     }
-    var wifiInfo: WifiInfo? = null
+    var wifiMgr: WifiManager? = null
 
     //endregion
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,28 +88,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         //region Location Block
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationRTF = Location("locationManager")
-        locationRTF!!.apply {
+        with(locationRTF!!) {
             latitude = 56.840750
             longitude = 60.650750
         }
         ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager!!.apply {
+            with(locationManager!!) {
                 requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
                 requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
             }
             requestLocationUpdateMade = true
         } else ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         //endregion
-        //region WiFi Block
-        val wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        wifiInfo = wifiMgr.connectionInfo
-        //endregion
+        wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
         classCardCreate() //Заполнение всех View
         tabHostCreate()
         listViewCreate()
         startActivity(Intent(this, PreviewActivity::class.java)) //Запуск превью
-
     }
 
     @SuppressLint("ResourceAsColor")
@@ -123,12 +119,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     if (!requestLocationUpdateMade) makeRequestLocationUpdate()
                     progressBar!!.visibility = View.VISIBLE
-                    checkButton.isEnabled = false
+                    checkButton.isClickable = false
                     withContext(Dispatchers.IO){ while(locationStudent == null) delay(50) }
-                    wifiInfo ?: let {
-                        Toast.makeText(this@MainActivity, "Нет подключения", Toast.LENGTH_LONG).show()
-                        return@launch
-                    }
                     if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                              ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
                              return@launch
@@ -137,10 +129,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.makeText(this@MainActivity, "СРОЧНО НА ПАРУ", Toast.LENGTH_LONG).show()
                     else Toast.makeText(this@MainActivity, "ЗНАНИЕ - СИЛА", Toast.LENGTH_LONG).show()
                     locationText!!.text = formatLocation(locationStudent)
-                    wifiText!!.text = wifiInfo!!.ssid
+                    wifiText!!.text = wifiMgr?.connectionInfo?.ssid
                     progressBar!!.visibility = View.INVISIBLE
-                    checkButton.isEnabled = true
-
+                    checkButton.isClickable = true
                     }
                  }
             R.id.exitButton -> {
@@ -211,7 +202,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @SuppressLint("MissingPermission")
     private fun makeRequestLocationUpdate(){
-        locationManager!!.apply {
+        with(locationManager!!) {
             requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
             requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
         }
