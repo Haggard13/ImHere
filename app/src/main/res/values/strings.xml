@@ -9,4 +9,34 @@
     <string name="attribute_name_who">textWho</string>
     <string name="attribute_name_time">textTime</string>
     <string name="attribute_name_img">image</string>
+    <string-array name="courses">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>Все курсы</item>
+    </string-array>
+    <string-array name="institutions">
+        <item>ИРИТ-РТФ</item>
+        <item>ИСА</item>
+        <item>УГИ</item>
+        <item>ФТИ</item>
+        <item>ИЕНиМ</item>
+        <item>ИНМиТ</item>
+        <item>ИнФО</item>
+        <item>ХТИ</item>
+        <item>Все институты</item>
+    </string-array>
+    <string-array name="refund_form">
+        <item>Бюджет</item>
+        <item>Коммерция</item>
+        <item>Все формы</item>
+    </string-array>
+    <string-array name="students_union">
+        <item>Да</item>
+        <item>Нет</item>
+        <item>Все студенты</item>
+    </string-array>
 </resources>
