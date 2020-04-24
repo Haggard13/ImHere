@@ -75,7 +75,7 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
         //TODO: реализовать проверку адресса
         return true
     }
-
+    //Получение фильтра для выбора получателей
     private fun getStudentFilter(): String {
         if (switchAllStudents.isChecked) return "6822"
         val filter = StringBuilder()
