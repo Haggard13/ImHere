@@ -13,20 +13,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AddInterviewActivity"></activity>
+        <activity
+            android:name=".AddInterviewActivity"
+            android:theme="@style/SpinnerStyle" />
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".PreviewActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".MainActivity"
-            android:label="I\&apos;m Here"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".StudentActivity"
+            android:label="I\&apos;m Here"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

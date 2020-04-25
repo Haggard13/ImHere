@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.View
@@ -20,7 +19,7 @@ import kotlinx.coroutines.*
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class StudentActivity : AppCompatActivity(), View.OnClickListener {
     //region Arrays For List View
     var name = arrayOf("Как дела", "Универ", "Преподы", "Кто ты", "За путина", "Опрос", "Радик", "Радик")
     var type = arrayOf("временный", "постоянный", "временный", "постоянный", "временный", "постоянный", "временный", "временный")
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     //endregion
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.student_main)
 
         //region Property Initializing
         progressBar = findViewById(R.id.progressBar)
@@ -92,42 +91,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             latitude = 56.840750
             longitude = 60.650750
         }
-        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        ActivityCompat.requestPermissions(this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             with(locationManager!!) {
                 requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
                 requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
             }
             requestLocationUpdateMade = true
-        } else ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        } else ActivityCompat.requestPermissions(this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         //endregion
         wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
         classCardCreate() //Заполнение всех View
         tabHostCreate()
         listViewCreate()
-        startActivity(Intent(this, PreviewActivity::class.java)) //Запуск превью
     }
 
-    @SuppressLint("ResourceAsColor")
     override fun onClick(v: View) {
         when (v.id) {
             R.id.checkButton -> {
                 GlobalScope.launch(Dispatchers.Main) {
-                    if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+                    if (ActivityCompat.checkSelfPermission(this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
                         return@launch
                     }
                     if (!requestLocationUpdateMade) makeRequestLocationUpdate()
                     progressBar!!.visibility = View.VISIBLE
                     checkButton.isClickable = false
                     withContext(Dispatchers.IO){ while(locationStudent == null) delay(50) }
-                    if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                             ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+                    if (ActivityCompat.checkSelfPermission(this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                             ActivityCompat.requestPermissions(this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
                              return@launch
                          }
                     if (locationStudent!!.distanceTo(locationRTF) > 100)
-                        Toast.makeText(this@MainActivity, "СРОЧНО НА ПАРУ", Toast.LENGTH_LONG).show()
-                    else Toast.makeText(this@MainActivity, "ЗНАНИЕ - СИЛА", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@StudentActivity, "СРОЧНО НА ПАРУ", Toast.LENGTH_LONG).show()
+                    else Toast.makeText(this@StudentActivity, "ЗНАНИЕ - СИЛА", Toast.LENGTH_LONG).show()
                     locationText!!.text = formatLocation(locationStudent)
                     wifiText!!.text = wifiMgr?.connectionInfo?.ssid
                     progressBar!!.visibility = View.INVISIBLE
@@ -135,12 +132,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                  }
             R.id.exitButton -> {
-                startActivity(Intent(this, AddInterviewActivity::class.java))
-                /*val sh = getSharedPreferences("authentication", Context.MODE_PRIVATE)
-                val e = sh.edit()
-                e.putBoolean("authentication", false)
-                e.apply()
-                startActivity(Intent(this, LoginActivity::class.java))*/
+                val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
+                sp.edit().clear().apply()
+                startActivity(Intent(this, LoginActivity::class.java))
+                super@StudentActivity.finish()
             }
         }
     }

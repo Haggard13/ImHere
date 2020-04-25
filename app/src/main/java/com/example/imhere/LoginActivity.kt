@@ -1,6 +1,7 @@
 package com.example.imhere
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -27,6 +28,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         val loginStr = loginText!!.text.toString()
         val passwordHashCode = passwordText!!.text.toString().hashCode()
+        var status = 1
         val dbHelper = DataBaseHelper(this)
         val db = dbHelper.writableDatabase
         val c = db.query("accountTable", null, "login == ?", arrayOf(loginStr), null, null, null)
@@ -40,15 +42,16 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG).show()
             return
         }
+        status = c.getInt(c.getColumnIndex("status"))
         c.close()
         dbHelper.close()
         val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
         val ed = sp.edit()
         ed.putBoolean("authentication", true)
+        ed.putInt("status", status)
         ed.apply()
-        super.finish()
-    }
-
-    override fun onBackPressed() {
+        if (status == 1) startActivity(Intent(this, AddInterviewActivity::class.java))
+        else startActivity(Intent(this, StudentActivity::class.java))
+        super@LoginActivity.finish()
     }
 }

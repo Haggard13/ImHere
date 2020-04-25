@@ -7,53 +7,81 @@
     android:background="#FFFFFF"
     tools:context=".AddInterviewActivity">
 
-    <Spinner
-        android:id="@+id/spinnerInstitutions"
+    <LinearLayout
         android:layout_width="330dp"
-        android:layout_height="25dp"
-        android:entries="@array/institutions"
+        android:layout_height="50dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.384" />
+        app:layout_constraintVertical_bias="0.594">
 
-    <Spinner
-        android:id="@+id/spinnerFormRefund"
-        android:layout_width="330dp"
-        android:layout_height="25dp"
-        android:entries="@array/refund_form"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.469" />
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Курсы" />
 
-    <Spinner
-        android:id="@+id/spinnerCourses"
-        android:layout_width="330dp"
-        android:layout_height="25dp"
-        android:entries="@array/courses"
-        android:saveEnabled="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        <Spinner
+            android:id="@+id/spinnerCourses"
+            android:layout_width="330dp"
+            android:layout_height="25dp"
+            android:background="#DFDFDF"
+            android:entries="@array/courses"
+            android:saveEnabled="true" />
 
-    <Spinner
-        android:id="@+id/spinnerStudentsUnion"
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="330dp"
-        android:layout_height="25dp"
-        android:entries="@array/students_union"
+        android:layout_height="50dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.552" />
+        app:layout_constraintVertical_bias="0.689">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Союз студентов" />
+
+        <Spinner
+            android:id="@+id/spinnerStudentsUnion"
+            android:layout_width="330dp"
+            android:layout_height="25dp"
+            android:background="#DFDFDF"
+            android:entries="@array/students_union" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="330dp"
+        android:layout_height="50dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Институт" />
+
+        <Spinner
+            android:id="@+id/spinnerInstitutions"
+            android:layout_width="330dp"
+            android:layout_height="25dp"
+            android:background="#DFDFDF"
+            android:entries="@array/institutions" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/buttonAddInterview"
@@ -61,6 +89,7 @@
         android:layout_height="34dp"
         android:background="#00d9ff"
         android:text="@string/add"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -72,7 +101,7 @@
         android:id="@+id/editTextReference"
         android:layout_width="293dp"
         android:layout_height="46dp"
-        android:background="#ECECEC"
+        android:background="#DFDFDF"
         android:hint="@string/google_forms"
         android:inputType="textWebEditText"
         android:paddingLeft="5dp"
@@ -88,9 +117,12 @@
 
     <Switch
         android:id="@+id/switchAllStudents"
-        android:layout_width="309dp"
-        android:layout_height="24dp"
+        android:layout_width="313dp"
+        android:layout_height="35dp"
+        android:background="#dfdfdf"
         android:checked="true"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         android:password="false"
         android:shadowColor="#FFFFFF"
         android:text="@string/interview_all"
@@ -101,5 +133,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.208" />
+
+    <Button
+        android:id="@+id/buttonExit2"
+        android:layout_width="91dp"
+        android:layout_height="34dp"
+        android:background="@color/colorOn"
+        android:text="Выйти"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.846"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.281" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
