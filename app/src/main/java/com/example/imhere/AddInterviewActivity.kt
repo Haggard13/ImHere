@@ -95,7 +95,7 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
     }
     //Получение фильтра для выбора получателей
     private fun getStudentFilter(): String {
-        if (switchAllStudents.isChecked) return "6822"
+        if (switchAllStudents.isChecked) return "682"
         val filter = StringBuilder()
         filter.append(spinnerCourses.selectedItemPosition)
         filter.append(spinnerInstitution.selectedItemPosition)

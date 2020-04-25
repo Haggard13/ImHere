@@ -19,7 +19,7 @@ class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataB
     override fun onCreate(db: SQLiteDatabase) {
         db.run {
             execSQL("create table accountTable(login text primary key, password integer, status integer);")
-            execSQL("create table interviewTable(interview text primary key, filter text);")
+            execSQL("create table interviewTable(interview text primary key, filter text, name text, who text, time text);")
             execSQL("create table institutionTable(institution text primary key, lat real, long real);")
         }
         for (i in login.indices) {
@@ -38,5 +38,6 @@ class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataB
         }
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+    }
 }

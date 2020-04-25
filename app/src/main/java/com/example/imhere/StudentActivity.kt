@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.View
@@ -20,14 +22,10 @@ import java.util.*
 
 
 class StudentActivity : AppCompatActivity(), View.OnClickListener {
-    //region Arrays For List View
-    var name = arrayOf("Как дела", "Универ", "Преподы", "Кто ты", "За путина", "Опрос", "Радик", "Радик")
-    var type = arrayOf("временный", "постоянный", "временный", "постоянный", "временный", "постоянный", "временный", "временный")
-    var who = arrayOf("радик", "Универ", "Преподы", "союз", "деканат", "декан", "преподы", "преподы")
-    var time = arrayOf("12:00", "не ограничено", "12:00", "не ограничено", "12:00", "не ограничено", "12:00", "12:00")
 
     //endregion
     //region Property Declaration
+    private var referenceList = mutableListOf("")
     private var progressBar: ProgressBar? = null
     var listViewInterview: ListView? = null
     private lateinit var checkButton: Button
@@ -157,28 +155,36 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun listViewCreate() {
-        val data = ArrayList<Map<String, Any?>>(name.size)
+        val dbh = DataBaseHelper(this)
+        val db = dbh.writableDatabase
+        val c = db.query("interviewTable", null, null, null, null, null, null)
+        val data = ArrayList<Map<String, Any?>>(c.count)
         var m: MutableMap<String, Any?>
         val from = arrayOf(getString(R.string.attribute_name_name),
-                getString(R.string.attribute_name_type),
                 getString(R.string.attribute_name_who),
                 getString(R.string.attribute_name_time),
-                getString(R.string.attribute_name_img))
+                getString(R.string.attribute_name_reference))
         val to = intArrayOf(R.id.interviewNameText,
-                R.id.interviewTypeText,
                 R.id.interviewWhoText,
                 R.id.interviewTimeText,
-                R.id.interviewImage)
-        for (i in name.indices) {
+                R.id.referenceText)
+        while(c.moveToNext()) {
             m = HashMap()
-            m[from[0]] = name[i]
-            m[from[1]] = type[i]
-            m[from[2]] = who[i]
-            m[from[3]] = time[i]
-            m[from[4]] = R.mipmap.ic_launcher
+            m[from[0]] = c.getString(c.getColumnIndex("name"))
+            m[from[1]] = c.getString(c.getColumnIndex("who"))
+            m[from[2]] = c.getString(c.getColumnIndex("time"))
+            m[from[3]] = c.getString(c.getColumnIndex("interview"))
             data.add(m)
+            if (referenceList[0].isEmpty()) referenceList[0] = c.getString(c.getColumnIndex("interview"))
+            else referenceList.add(c.getString(c.getColumnIndex("interview")))
         }
         listViewInterview!!.adapter = SimpleAdapter(this, data, R.layout.interview_card, from, to)
+        listViewInterview!!.onItemClickListener = AdapterView.OnItemClickListener {
+            _: AdapterView<*>, _: View, position: Int, _: Long ->
+            run {
+                startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position])))
+            }
+        }
     }
 
     private fun classCardCreate() {
