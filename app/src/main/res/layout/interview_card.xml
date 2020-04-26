@@ -5,57 +5,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <TableRow
-        android:id="@+id/tableRowInterview"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#07373737"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.024">
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="14dp">
 
-        <LinearLayout
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        <TextView
+            android:id="@+id/interviewNameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="TextView"
+            android:textColor="#353535"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/interviewNameText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="TextView"
-                android:textColor="#353535"
-                android:textStyle="bold" />
+        <TextView
+            android:id="@+id/interviewWhoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="TextView"
+            android:textColor="#353535" />
 
-            <TextView
-                android:id="@+id/interviewWhoText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="TextView"
-                android:textColor="#353535" />
+        <TextView
+            android:id="@+id/interviewTimeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="TextView"
+            android:textColor="#353535" />
 
-            <TextView
-                android:id="@+id/interviewTimeText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="TextView"
-                android:textColor="#353535" />
+        <TextView
+            android:id="@+id/referenceText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="TextView"
+            android:textColor="#353535" />
 
-            <TextView
-                android:id="@+id/referenceText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="TextView"
-                android:textColor="#353535" />
-
-        </LinearLayout>
-    </TableRow>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 
 //База данных приложения
 //Готовы базы данных паролей(если не выйдет с ЛК) и база данных с координатами некоторых институтов
-class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataBase", null, 1) {
+class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataBaseSuper", null, 1) {
 
     var login = arrayOf("strontium2001@mail.ru", "elizaveta.ezhova01@mail.ru", "admin")
     var password = intArrayOf("Elzahaggard13@".hashCode(), "Elzahaggard13!".hashCode(), "admin".hashCode())

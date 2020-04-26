@@ -7,20 +7,74 @@
     android:background="#FFFFFF"
     tools:context=".AddInterviewActivity">
 
-    <LinearLayout
-        android:layout_width="330dp"
-        android:layout_height="50dp"
-        android:orientation="vertical"
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="313dp"
+        android:layout_height="35dp"
+        android:background="#DFDFDF"
+        android:hint="Введите название опроса"
+        android:inputType="textWebEditText"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="#101010"
+        android:textColorHint="#A3A3A3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.594">
+        app:layout_constraintVertical_bias="0.293" />
+
+    <EditText
+        android:id="@+id/editTextAuthor"
+        android:layout_width="313dp"
+        android:layout_height="35dp"
+        android:background="#DFDFDF"
+        android:hint="Введите автора опроса"
+        android:inputType="textWebEditText"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="#101010"
+        android:textColorHint="#A3A3A3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.161" />
+
+    <EditText
+        android:id="@+id/editTextTime"
+        android:layout_width="313dp"
+        android:layout_height="35dp"
+        android:background="#DFDFDF"
+        android:hint="Введите срок (дд.мм чч:мм)"
+        android:inputType="textWebEditText"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="#101010"
+        android:textColorHint="#A3A3A3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.227" />
+
+    <LinearLayout
+        android:layout_width="330dp"
+        android:layout_height="50dp"
+        android:background="#dfdfdf"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.466">
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
             android:text="Курсы" />
 
         <Spinner
@@ -36,18 +90,20 @@
     <LinearLayout
         android:layout_width="330dp"
         android:layout_height="50dp"
+        android:background="#dfdfdf"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.689">
+        app:layout_constraintVertical_bias="0.561">
 
         <TextView
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
             android:text="Союз студентов" />
 
         <Spinner
@@ -62,16 +118,20 @@
         android:id="@+id/linearLayout"
         android:layout_width="330dp"
         android:layout_height="50dp"
+        android:background="#dfdfdf"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.369">
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
             android:text="Институт" />
 
         <Spinner
@@ -92,15 +152,15 @@
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.875"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.959" />
+        app:layout_constraintVertical_bias="0.953" />
 
     <EditText
         android:id="@+id/editTextReference"
-        android:layout_width="293dp"
-        android:layout_height="46dp"
+        android:layout_width="313dp"
+        android:layout_height="35dp"
         android:background="#DFDFDF"
         android:hint="@string/google_forms"
         android:inputType="textWebEditText"
@@ -110,10 +170,9 @@
         android:textColorHint="#A3A3A3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.086" />
+        app:layout_constraintVertical_bias="0.699" />
 
     <Switch
         android:id="@+id/switchAllStudents"
@@ -129,10 +188,9 @@
         android:textColor="#171717"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.208" />
+        app:layout_constraintVertical_bias="0.092" />
 
     <Button
         android:id="@+id/buttonExit2"
@@ -143,9 +201,9 @@
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.846"
+        app:layout_constraintHorizontal_bias="0.128"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.281" />
+        app:layout_constraintVertical_bias="0.955" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

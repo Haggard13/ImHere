@@ -185,6 +185,8 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position])))
             }
         }
+        c.close()
+        dbh.close()
     }
 
     private fun classCardCreate() {

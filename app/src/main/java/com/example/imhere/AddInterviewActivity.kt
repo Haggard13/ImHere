@@ -7,6 +7,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.webkit.URLUtil
 import android.widget.*
 import java.lang.StringBuilder
 
@@ -14,6 +15,9 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
 
     //region Property Declaration
     var editTextReference: EditText? = null
+    var editTextAuthor: EditText? = null
+    var editTextTime: EditText? = null
+    var editTextName: EditText? = null
     lateinit var switchAllStudents: Switch
     lateinit var spinnerCourses: Spinner
     lateinit var spinnerInstitution: Spinner
@@ -29,6 +33,9 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
         setContentView(R.layout.activity_add_interview)
         //region Property Initializing
         editTextReference = findViewById(R.id.editTextReference)
+        editTextAuthor = findViewById(R.id.editTextAuthor)
+        editTextTime = findViewById(R.id.editTextTime)
+        editTextName = findViewById(R.id.editTextName)
         switchAllStudents = findViewById(R.id.switchAllStudents)
         spinnerCourses = findViewById(R.id.spinnerCourses)
         spinnerCourses.setSelection(6)
@@ -65,8 +72,15 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
                 with(cv) {
                     put("interview", reference)
                     put("filter", getStudentFilter())
+                    put("who", editTextAuthor!!.text.toString())
+                    put("name", editTextName!!.text.toString())
+                    put("time", editTextTime!!.text.toString())
                 }
-                db.insert("interviewTable", null, cv)
+                if(db.insert("interviewTable", null, cv) == (-1).toLong()) {
+                    Toast.makeText(this, "Опрос уже существует", Toast.LENGTH_LONG).show()
+                    dbh.close()
+                    return@onClick
+                }
                 dbh.close()
                 Toast.makeText(this, "Опрос успешно добавлен", Toast.LENGTH_LONG).show()
             }
@@ -91,7 +105,7 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
     private fun tryReference(): Boolean {
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform\?usp=sf_link""")
-        return reference!!.matches(regexShort) || reference!!.matches(regexLong)
+        return (reference!!.matches(regexShort) || reference!!.matches(regexLong)) && URLUtil.isValidUrl(reference)
     }
     //Получение фильтра для выбора получателей
     private fun getStudentFilter(): String {
