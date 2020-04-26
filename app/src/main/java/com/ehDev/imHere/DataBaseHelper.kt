@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 //База данных приложения
-//Готовы базы данных паролей(если не выйдет с ЛК) и база данных с координатами некоторых институтов
+//Готовы таблица паролей(если не выйдет с ЛК) и таблица с координатами некоторых институтов, таблица с опросами
 class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataBaseSuper", null, 1) {
 
     //region Array for accountTable
