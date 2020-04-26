@@ -1,4 +1,4 @@
-package com.example.imhere
+package com.ehDev.imHere
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,6 +13,7 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.View
+import android.webkit.URLUtil
 import android.widget.*
 import android.widget.TabHost.TabSpec
 import androidx.appcompat.app.AppCompatActivity
@@ -155,6 +156,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun listViewCreate() {
+        val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682")
         val dbh = DataBaseHelper(this)
         val db = dbh.writableDatabase
         val c = db.query("interviewTable", null, null, null, null, null, null)
@@ -169,6 +171,8 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.interviewTimeText,
                 R.id.referenceText)
         while(c.moveToNext()) {
+            if (!URLUtil.isValidUrl(c.getString(c.getColumnIndex("interview")))) continue
+            if (c.getString(c.getColumnIndex("filter")) != filter) continue
             m = HashMap()
             m[from[0]] = c.getString(c.getColumnIndex("name"))
             m[from[1]] = c.getString(c.getColumnIndex("who"))

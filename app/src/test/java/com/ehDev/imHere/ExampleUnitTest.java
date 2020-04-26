@@ -1,4 +1,4 @@
-package com.example.imhere;
+package com.ehDev.imHere;
 
 import org.junit.Test;
 

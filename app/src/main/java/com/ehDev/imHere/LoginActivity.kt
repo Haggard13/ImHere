@@ -1,4 +1,4 @@
-package com.example.imhere
+package com.ehDev.imHere
 
 import android.content.Context
 import android.content.Intent
@@ -28,7 +28,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         val loginStr = loginText!!.text.toString()
         val passwordHashCode = passwordText!!.text.toString().hashCode()
-        var status = 1
+        val status: Int
+        val filter: String
         val dbHelper = DataBaseHelper(this)
         val db = dbHelper.writableDatabase
         val c = db.query("accountTable", null, "login == ?", arrayOf(loginStr), null, null, null)
@@ -43,13 +44,17 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             return
         }
         status = c.getInt(c.getColumnIndex("status"))
+        filter = c.getString(c.getColumnIndex("filter"))
         c.close()
         dbHelper.close()
         val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
         val ed = sp.edit()
-        ed.putBoolean("authentication", true)
-        ed.putInt("status", status)
-        ed.apply()
+        with(ed) {
+            putBoolean("authentication", true)
+            putInt("status", status)
+            putString("filter", filter)
+            apply()
+        }
         if (status == 1) startActivity(Intent(this, AddInterviewActivity::class.java))
         else startActivity(Intent(this, StudentActivity::class.java))
         super@LoginActivity.finish()

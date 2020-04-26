@@ -32,11 +32,6 @@
         <item>ХТИ</item>
         <item>Все институты</item>
     </string-array>
-    <string-array name="refund_form">
-        <item>Бюджет</item>
-        <item>Коммерция</item>
-        <item>Все формы</item>
-    </string-array>
     <string-array name="students_union">
         <item>Да</item>
         <item>Нет</item>
