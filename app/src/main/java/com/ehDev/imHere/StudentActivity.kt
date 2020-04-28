@@ -172,7 +172,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.referenceText)
         while(c.moveToNext()) {
             if (!URLUtil.isValidUrl(c.getString(c.getColumnIndex("interview")))) continue
-            if (c.getString(c.getColumnIndex("filter")) != filter) continue
+            if (c.getString(c.getColumnIndex("filter")) != filter && c.getString(c.getColumnIndex("filter")) != "682") continue
             m = HashMap()
             m[from[0]] = c.getString(c.getColumnIndex("name"))
             m[from[1]] = c.getString(c.getColumnIndex("who"))
