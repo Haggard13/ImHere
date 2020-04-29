@@ -9,7 +9,7 @@
 
     <EditText
         android:id="@+id/editTextName"
-        android:layout_width="313dp"
+        android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
         android:hint="Введите название опроса"
@@ -26,7 +26,7 @@
 
     <EditText
         android:id="@+id/editTextAuthor"
-        android:layout_width="313dp"
+        android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
         android:hint="Введите автора опроса"
@@ -43,7 +43,7 @@
 
     <EditText
         android:id="@+id/editTextTime"
-        android:layout_width="313dp"
+        android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
         android:hint="Введите срок (дд.мм чч:мм)"
@@ -159,7 +159,7 @@
 
     <EditText
         android:id="@+id/editTextReference"
-        android:layout_width="313dp"
+        android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
         android:hint="@string/google_forms"
@@ -176,7 +176,7 @@
 
     <Switch
         android:id="@+id/switchAllStudents"
-        android:layout_width="313dp"
+        android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#dfdfdf"
         android:checked="true"
@@ -205,5 +205,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.955" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="216dp"
+        android:layout_height="25dp"
+        android:gravity="center"
+        android:text="Добавить Опрос"
+        android:textColor="#00d9ff"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.485"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.025" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
