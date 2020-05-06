@@ -4,6 +4,7 @@ import org.jsoup.nodes.Document
 import java.util.*
 
 internal object ParsingClass {
+
     var weekData: Dictionary<String, DayData>? = null
     fun scheduleParsing(doc: Document) {
         val elements = doc.getElementsByAttribute("div#inner")
