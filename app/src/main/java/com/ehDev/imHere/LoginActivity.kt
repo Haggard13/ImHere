@@ -8,23 +8,26 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_login.*
 
-class LoginActivity : AppCompatActivity(), View.OnClickListener {
-    lateinit var loginButton: Button
-    private var loginText: EditText? = null
-    private var passwordText: EditText? = null
+class LoginActivity : AppCompatActivity(),
+    View.OnClickListener {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        loginButton = findViewById(R.id.loginButton)
-        loginText = findViewById(R.id.loginText)
-        passwordText = findViewById(R.id.passwordText)
+
         loginButton.setOnClickListener(this)
     }
 
-    /*По клику - проверка данных с данными в базе данных
-    * Механизм на случай, если не выйдет с ЛК
-    * + готовая форма аутентификации*/
+    /**
+     * По клику - проверка данных с данными в базе данных
+     * Механизм на случай, если не выйдет с ЛК
+     * + готовая форма аутентификации
+     * */
+    // TODO: переписать
+    // TODO: затащить Room
+    // TODO: разнести логику для бд в отдельный файл
     override fun onClick(v: View) {
         val loginStr = loginText!!.text.toString()
         val passwordHashCode = passwordText!!.text.toString().hashCode()
@@ -55,8 +58,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             putString("filter", filter)
             apply()
         }
-        if (status == 1) startActivity(Intent(this, AddInterviewActivity::class.java))
-        else startActivity(Intent(this, StudentActivity::class.java))
+        val activity = when (status) {
+            1 -> AddInterviewActivity::class.java
+            else -> StudentActivity::class.java
+        }
+        startActivity(Intent(this, activity))
         super@LoginActivity.finish()
     }
 }

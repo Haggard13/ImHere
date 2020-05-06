@@ -27,6 +27,7 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
     var reference: String? = null
     //endregion
 
+    // TODO: разнести логику
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,14 +103,16 @@ class AddInterviewActivity : AppCompatActivity(), View.OnClickListener, Compound
     } //Вкл - выкл спиннеры
 
     //Проверка ссылки на форму
+    // TODO: порефачить
     private fun tryReference(): Boolean {
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform\?usp=sf_link""")
         return (reference!!.matches(regexShort) || reference!!.matches(regexLong)) && URLUtil.isValidUrl(reference)
     }
     //Получение фильтра для выбора получателей
+    // todo: рефачить
     private fun getStudentFilter(): String {
-        if (switchAllStudents.isChecked) return "682"
+        if (switchAllStudents.isChecked) return "682" // todo: const
         val filter = StringBuilder()
         filter.append(spinnerCourses.selectedItemPosition)
         filter.append(spinnerInstitution.selectedItemPosition)

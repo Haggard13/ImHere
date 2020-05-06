@@ -20,6 +20,8 @@ class PreviewActivity : AppCompatActivity() {
 
             delay(1000)
 
+            // TODO: разбить логику
+
             withContext(Dispatchers.Main) {
 
                 val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)

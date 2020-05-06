@@ -5,6 +5,9 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
+// TODO: разобраться перед тем, как закатывать Room
+// TODO: разнести
+
 //База данных приложения
 //Готовы таблица паролей(если не выйдет с ЛК) и таблица с координатами некоторых институтов, таблица с опросами
 class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataBaseSuper", null, 1) {

@@ -31,6 +31,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
     var listViewInterview: ListView? = null
     private lateinit var checkButton: Button
     private lateinit var exitButton: Button
+
     var locationText: TextView? = null
     var wifiText: TextView? = null
     var classImage: ImageView? = null
@@ -40,10 +41,13 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
     var auditoryText: TextView? = null
     var lecturerText: TextView? = null
     var timeText: TextView? = null
+
     var locationManager: LocationManager? = null
     var locationStudent: Location? = null
     var locationRTF: Location? = null
     var requestLocationUpdateMade = false
+
+    // TODO: вынести логику
     private var locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             locationStudent = location
@@ -60,6 +64,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
     var wifiMgr: WifiManager? = null
 
     //endregion
+    //TODO: разнести
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.student_main)
@@ -105,6 +110,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
         listViewCreate()
     }
 
+    // TODO: переписать onClick-и
     override fun onClick(v: View) {
         when (v.id) {
             R.id.checkButton -> {
@@ -140,6 +146,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     //region Methods For Filling Layout
+    // TODO: ну тут явно чет не так
     private fun tabHostCreate() {
         val tabHost = findViewById<TabHost>(R.id.tabhost)
         tabHost.setup()
@@ -155,6 +162,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
         tabHost.setCurrentTabByTag("tag1")
     }
 
+    // TODO: жду Room и переписываю
     private fun listViewCreate() {
         val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682")
         val dbh = DataBaseHelper(this)

@@ -4,6 +4,7 @@ import org.jsoup.nodes.Document
 import java.util.Date
 import java.util.Dictionary
 
+//TODO: выяснить зачем существует
 internal object ParsingClass {
 
     var weekData: Dictionary<String, DayData>? = null
