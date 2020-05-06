@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.*
 
 class PreviewActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preview)
@@ -14,14 +15,25 @@ class PreviewActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
         GlobalScope.launch {
+
             delay(1000)
-            withContext(Dispatchers.Main){
+
+            withContext(Dispatchers.Main) {
+
                 val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
-                if (sp.contains("authentication") && sp.getBoolean("authentication", false)) {
-                    if (sp.getInt("status", 2) == 0) startActivity(Intent(this@PreviewActivity, StudentActivity::class.java))
-                    else startActivity(Intent(this@PreviewActivity, AddInterviewActivity::class.java))
-                } else startActivity(Intent(this@PreviewActivity, LoginActivity::class.java))
+
+                when (sp.contains("authentication") && sp.getBoolean("authentication", false)) {
+
+                    false -> startActivity(Intent(this@PreviewActivity, LoginActivity::class.java))
+
+                    true -> when (sp.getInt("status", 2) == 0) {
+                        true -> startActivity(Intent(this@PreviewActivity, StudentActivity::class.java))
+                        else -> startActivity(Intent(this@PreviewActivity, AddInterviewActivity::class.java))
+                    }
+                }
+
                 super@PreviewActivity.finish()
             }
         }
