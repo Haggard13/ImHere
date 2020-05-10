@@ -208,6 +208,7 @@ class StudentActivity : AppCompatActivity(), View.OnClickListener {
         auditoryText!!.text = "ГУК-404"
         lecturerText!!.text = "Рыжкова Н. Г."
         timeText!!.text = "12:00"
+        classImage!!.setImageResource(R.drawable.m)
     }
 
     //endregion
