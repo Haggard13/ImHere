@@ -66,6 +66,7 @@ class DataBaseHelper(context: Context?) : SQLiteOpenHelper(context, "imHereDataB
             execSQL("create table accountTable(login text primary key, password integer, status integer, filter text);")
             execSQL("create table interviewTable(interview text primary key, filter text, name text, who text, time text);")
             execSQL("create table institutionTable(institution text primary key, lat real, long real);")
+            execSQL("create table scheduleTable(class datetime primary key, number integer, name text, lecturer text, auditory text, type text);")
         }
         for (i in login.indices) {
             val cv = ContentValues()
