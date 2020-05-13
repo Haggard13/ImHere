@@ -1,6 +1,5 @@
 package com.ehDev.imHere
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -39,7 +38,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
             if (account.isAccountValid().not()) return@launch
 
-            saveAccountToSharedPrefs(account)
+            loginViewModel.saveAccountToSharedPrefs(account)
 
             val activity = when (account.status) {
                 "1" -> AddInterviewActivity::class.java
@@ -53,18 +52,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
     private fun startActivityIntent(activity: Class<out Any>) = startActivity(Intent(this, activity))
-
-    private fun saveAccountToSharedPrefs(account: AccountEntity) {
-
-        val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
-
-        with(sp.edit()) {
-            putBoolean("authentication", true)
-            putString("status", account.status)
-            putString("filter", account.filter)
-            apply()
-        }
-    }
 
     private fun AccountEntity?.isAccountValid(): Boolean = when {
 
