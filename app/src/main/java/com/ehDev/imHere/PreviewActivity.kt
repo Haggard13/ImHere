@@ -30,7 +30,7 @@ class PreviewActivity : AppCompatActivity() {
 
                     false -> startActivity(Intent(this@PreviewActivity, LoginActivity::class.java))
 
-                    true -> when (sp.getInt("status", 2) == 0) {
+                    true -> when (sp.getString("status", "0") == "0") {
                         true -> startActivity(Intent(this@PreviewActivity, StudentActivity::class.java))
                         else -> startActivity(Intent(this@PreviewActivity, AddInterviewActivity::class.java))
                     }
