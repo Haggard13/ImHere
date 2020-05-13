@@ -33,6 +33,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         val filter: String
         val dbHelper = DataBaseHelper(this)
         val db = dbHelper.writableDatabase
+
         val c = db.query("accountTable", null, "login == ?", arrayOf(loginStr), null, null, null)
         if (c == null || c.count == 0) {
             Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG).show()
