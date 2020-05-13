@@ -30,8 +30,7 @@ import kotlinx.coroutines.withContext
 import java.util.ArrayList
 import java.util.HashMap
 
-class StudentActivity : AppCompatActivity(),
-    View.OnClickListener {
+class StudentActivity : AppCompatActivity() {
 
     private var referenceList = mutableListOf("")
 
@@ -66,9 +65,6 @@ class StudentActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.student_main)
 
-        //endregion
-        checkButton.setOnClickListener(this)
-        exitButton.setOnClickListener(this)
         progressBar.visibility = View.INVISIBLE
 
         //region Location Block
@@ -100,65 +96,60 @@ class StudentActivity : AppCompatActivity(),
         listViewCreate()
     }
 
-    // TODO: переписать onClick-и
-    override fun onClick(v: View) {
+    fun onCheckBtnClick(v: View) {
 
-        when (v.id) {
-
-            R.id.checkButton -> {
-                GlobalScope.launch(Dispatchers.Main) {
-                    if (ActivityCompat.checkSelfPermission(
-                            this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        ActivityCompat.requestPermissions(
-                            this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-                        )
-                        return@launch
-                    }
-
-                    if (requestLocationUpdateMade.not()) {
-                        makeRequestLocationUpdate()
-                    }
-
-                    progressBar.visibility = View.VISIBLE
-                    checkButton.isClickable = false
-
-                    withContext(Dispatchers.IO) {
-                        while (locationStudent == null)
-                            delay(50)
-                    }
-
-                    if (ActivityCompat.checkSelfPermission(
-                            this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        ActivityCompat.requestPermissions(
-                            this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-                        )
-                        return@launch
-                    }
-
-                    val toastText = when (locationStudent!!.distanceTo(locationRTF) > 100) {
-                        true -> "СРОЧНО НА ПАРУ"
-                        false -> "ЗНАНИЕ - СИЛА"
-                    }
-                    showToast(toastText)
-
-                    locationText.text = formatLocation(locationStudent)
-                    wifiText.text = wifiMgr?.connectionInfo?.ssid
-                    progressBar.visibility = View.INVISIBLE
-                    checkButton.isClickable = true
-                }
+        GlobalScope.launch(Dispatchers.Main) {
+            if (ActivityCompat.checkSelfPermission(
+                    this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
+                )
+                return@launch
             }
 
-            R.id.exitButton -> {
-                val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
-                sp.edit().clear().apply()
-                startActivity(Intent(this, LoginActivity::class.java))
-                super@StudentActivity.finish()
+            if (requestLocationUpdateMade.not()) {
+                makeRequestLocationUpdate()
             }
+
+            progressBar.visibility = View.VISIBLE
+            check_btn.isClickable = false
+
+            withContext(Dispatchers.IO) {
+                while (locationStudent == null)
+                    delay(50)
+            }
+
+            if (ActivityCompat.checkSelfPermission(
+                    this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
+                )
+                return@launch
+            }
+
+            val toastText = when (locationStudent!!.distanceTo(locationRTF) > 100) {
+                true -> "СРОЧНО НА ПАРУ"
+                false -> "ЗНАНИЕ - СИЛА"
+            }
+            showToast(toastText)
+
+            locationText.text = formatLocation(locationStudent)
+            wifiText.text = wifiMgr?.connectionInfo?.ssid
+            progressBar.visibility = View.INVISIBLE
+            check_btn.isClickable = true
         }
+    }
+
+    fun onExitBtnClick(v: View) {
+
+        val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
+        sp.edit().clear().apply()
+        startActivity(Intent(this, LoginActivity::class.java))
+        super@StudentActivity.finish()
     }
 
     //region Methods For Filling Layout
