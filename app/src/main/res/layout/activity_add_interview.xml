@@ -146,12 +146,13 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/buttonAddInterview"
+        android:id="@+id/add_interview_btn"
         android:layout_width="91dp"
         android:layout_height="34dp"
         android:background="#00d9ff"
         android:text="@string/add"
         android:textColor="#FFFFFF"
+        android:onClick="onAddInterviewBtnClick"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.875"
@@ -195,12 +196,13 @@
         app:layout_constraintVertical_bias="0.092" />
 
     <Button
-        android:id="@+id/buttonExit2"
+        android:id="@+id/exit_interview_btn"
         android:layout_width="91dp"
         android:layout_height="34dp"
         android:background="@color/colorOn"
         android:text="Выйти"
         android:textColor="#FFFFFF"
+        android:onClick="onExitInterviewBtnClick"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.128"
