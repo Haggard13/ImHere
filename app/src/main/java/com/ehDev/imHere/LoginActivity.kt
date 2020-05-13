@@ -12,7 +12,7 @@ import com.ehDev.imHere.vm.LoginViewModel
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
 
-class LoginActivity : AppCompatActivity(), View.OnClickListener {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
 
@@ -21,8 +21,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_login)
 
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
-
-        loginButton.setOnClickListener(this)
     }
 
     /**
@@ -30,7 +28,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
      * Механизм на случай, если не выйдет с ЛК
      * + готовая форма аутентификации
      * */
-    override fun onClick(v: View) {
+    fun onLoginBtnClick(v: View) {
         loginViewModel.viewModelScope.launch {
 
             val login = login_et.text.toString()
