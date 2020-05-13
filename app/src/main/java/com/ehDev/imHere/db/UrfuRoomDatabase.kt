@@ -52,16 +52,30 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
 
     private class AccountDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
 
-        private val fakeAccount = AccountEntity("000", "000".hashCode(), "1", "000")
-
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
 
             INSTANCE?.let { database ->
                 scope.launch {
-                    database.accountDao().insert(fakeAccount)
+                    for (index in FakeDataHolder.login.indices) {
+
+                        val fakeAccount = AccountEntity(
+
+                            login = FakeDataHolder.login[index],
+                            password = FakeDataHolder.password[index],
+                            status = index.calculateStatus(),
+                            filter = FakeDataHolder.filter[index]
+                        )
+
+                        database.accountDao().insert(fakeAccount)
+                    }
                 }
             }
+        }
+
+        private fun Int.calculateStatus() = when (this) {
+            2 -> "1"
+            else -> "0"
         }
     }
 }
