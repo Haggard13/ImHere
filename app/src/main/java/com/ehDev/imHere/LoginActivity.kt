@@ -4,14 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_login.*
 
-class LoginActivity : AppCompatActivity(),
-    View.OnClickListener {
+class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +26,9 @@ class LoginActivity : AppCompatActivity(),
     // TODO: затащить Room
     // TODO: разнести логику для бд в отдельный файл
     override fun onClick(v: View) {
-        val loginStr = loginText!!.text.toString()
-        val passwordHashCode = passwordText!!.text.toString().hashCode()
+
+        val loginStr = login_et.text.toString()
+        val passwordHashCode = password_et.text.toString().hashCode()
         val status: Int
         val filter: String
         val dbHelper = DataBaseHelper(this)
