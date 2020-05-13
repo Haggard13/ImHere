@@ -3,16 +3,27 @@ package com.ehDev.imHere
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.ehDev.imHere.db.entity.AccountEntity
+import com.ehDev.imHere.vm.LoginViewModel
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
+
+    private lateinit var loginViewModel: LoginViewModel
+    var test: AccountEntity? = AccountEntity("", 1, "", "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 
         loginButton.setOnClickListener(this)
     }
@@ -34,9 +45,16 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         val dbHelper = DataBaseHelper(this)
         val db = dbHelper.writableDatabase
 
+        loginViewModel.viewModelScope.launch {
+
+            test = loginViewModel.getAccountByLogin(loginStr)
+            Log.i("my tag", "test: $test")
+        }
+
+        // ищем в бд чет по логину
         val c = db.query("accountTable", null, "login == ?", arrayOf(loginStr), null, null, null)
         if (c == null || c.count == 0) {
-            Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG).show() // fixme: тут ток логин проверяется
             return
         }
         c.moveToFirst()
@@ -49,6 +67,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         filter = c.getString(c.getColumnIndex("filter"))
         c.close()
         dbHelper.close()
+
+        // записываем инфу с логином в шаредпрефы
         val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
         val ed = sp.edit()
         with(ed) {
@@ -57,6 +77,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             putString("filter", filter)
             apply()
         }
+
+        // в зависимости от статуса переходим дальше
         val activity = when (status) {
             1 -> AddInterviewActivity::class.java
             else -> StudentActivity::class.java
