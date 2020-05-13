@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var loginViewModel: LoginViewModel
-    var test: AccountEntity? = AccountEntity("", 1, "", "")
+    var account: AccountEntity? = AccountEntity("", 1, "", "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,20 +47,38 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
         loginViewModel.viewModelScope.launch {
 
-            test = loginViewModel.getAccountByLogin(loginStr)
-            Log.i("my tag", "test: $test")
+            account = loginViewModel.getAccountByLogin(loginStr)
+            Log.i("my tag", "account: $account")
+
+            when {
+
+                account == null -> {
+                    showToast("Неверный логин")
+                    return@launch
+                }
+
+                account?.password != passwordHashCode -> {
+                    showToast("Неверный пароль")
+                    return@launch
+                }
+
+                else -> {
+                    showToast("ебать, сработало")
+                    return@launch
+                }
+            }
         }
 
         // ищем в бд чет по логину
         val c = db.query("accountTable", null, "login == ?", arrayOf(loginStr), null, null, null)
         if (c == null || c.count == 0) {
-            Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG).show() // fixme: тут ток логин проверяется
+            showToast("Неверный логин или пароль") // fixme: тут ток логин проверяется
             return
         }
         c.moveToFirst()
         val rightPasswordHashCode = c.getInt(c.getColumnIndex("password"))
         if (passwordHashCode != rightPasswordHashCode) {
-            Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG).show()
+            showToast("Неверный логин или пароль")
             return
         }
         status = c.getInt(c.getColumnIndex("status"))
@@ -83,7 +101,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             1 -> AddInterviewActivity::class.java
             else -> StudentActivity::class.java
         }
-        startActivity(Intent(this, activity))
+        startActivityIntent(activity)
         super@LoginActivity.finish()
     }
+
+    private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+
+    private fun startActivityIntent(activity: Class<out Any>) = startActivity(Intent(this, activity))
 }
