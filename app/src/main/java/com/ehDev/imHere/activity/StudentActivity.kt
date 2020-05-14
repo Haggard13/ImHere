@@ -4,12 +4,10 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.View
@@ -21,8 +19,10 @@ import android.widget.TabHost.TabSpec
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.ehDev.imHere.DataBaseHelper
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
+import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,6 +34,7 @@ import java.util.HashMap
 
 class StudentActivity : AppCompatActivity() {
 
+    private lateinit var studentViewModel: StudentViewModel
     private var referenceList = mutableListOf("")
 
     var locationManager: LocationManager? = null
@@ -68,6 +69,8 @@ class StudentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.student_main)
 
+        studentViewModel = ViewModelProvider(this).get(StudentViewModel::class.java)
+
         progressBar.visibility = View.INVISIBLE
 
         //region Location Block
@@ -78,20 +81,21 @@ class StudentActivity : AppCompatActivity() {
             longitude = 60.650750
         }
         ActivityCompat.requestPermissions(this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-        if (
-            ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            with(locationManager!!) {
-                requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
-                requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
+
+        when (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            PackageManager.PERMISSION_GRANTED -> {
+                with(locationManager!!) {
+                    requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
+                    requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
+                }
             }
-            requestLocationUpdateMade = true
+
+            else -> ActivityCompat.requestPermissions(
+                this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
+            )
         }
-        else ActivityCompat.requestPermissions(
-            this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-        )
+
         //endregion
         wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
         classCardCreate() //Заполнение всех View
@@ -174,49 +178,58 @@ class StudentActivity : AppCompatActivity() {
 
     // TODO: жду Room и переписываю
     private fun listViewCreate() {
-        val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682")
-        val dbh = DataBaseHelper(this)
-        val db = dbh.writableDatabase
-        val c = db.query("interviewTable", null, null, null, null, null, null)
-        val data = ArrayList<Map<String, Any?>>(c.count)
-        var m: MutableMap<String, Any?>
-        val from = arrayOf(
-            getString(R.string.attribute_name_name),
-            getString(R.string.attribute_name_who),
-            getString(R.string.attribute_name_time),
-            getString(R.string.attribute_name_reference)
-        )
-        val to = intArrayOf(
-            R.id.interviewNameText,
-            R.id.interviewWhoText,
-            R.id.interviewTimeText,
-            R.id.referenceText
-        )
-        while (c.moveToNext()) {
-            if (!URLUtil.isValidUrl(c.getString(c.getColumnIndex("interview")))) continue
-            if (c.getString(c.getColumnIndex("filter")) != filter && c.getString(
-                    c.getColumnIndex("filter")
-                ) != "682"
-            ) continue
-            m = HashMap()
-            m[from[0]] = c.getString(c.getColumnIndex("name"))
-            m[from[1]] = c.getString(c.getColumnIndex("who"))
-            m[from[2]] = c.getString(c.getColumnIndex("time"))
-            m[from[3]] = c.getString(c.getColumnIndex("interview"))
-            data.add(m)
-            if (referenceList[0].isEmpty()) referenceList[0] = c.getString(c.getColumnIndex("interview"))
-            else referenceList.add(c.getString(c.getColumnIndex("interview")))
-        }
-        listViewInterview.adapter = SimpleAdapter(this, data,
-                                                  R.layout.interview_card, from, to)
-        listViewInterview.onItemClickListener =
-            AdapterView.OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-                run {
-                    startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position])))
-                }
+        studentViewModel.viewModelScope.launch {
+
+//            val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
+            val filter = "682"
+            val adapterData = ArrayList<Map<String, Any?>>()
+            var map: MutableMap<String, Any?>
+
+            val from = arrayOf(
+                getString(R.string.attribute_name_name),
+                getString(R.string.attribute_name_who),
+                getString(R.string.attribute_name_time),
+                getString(R.string.attribute_name_reference)
+            )
+            val to = intArrayOf(
+                R.id.interviewNameText,
+                R.id.interviewWhoText,
+                R.id.interviewTimeText,
+                R.id.referenceText
+            )
+
+            val allInterviews = studentViewModel.getAllInterviews()
+                .filter { it.interviewReference.isValidUrl() }
+                .filter { it.filter == filter }
+                .filter { it.filter == "682" }
+
+            allInterviews.forEach {
+
+                map = HashMap()
+                map[from[0]] = it.interviewer
+                map[from[1]] = it.interviewee
+                map[from[2]] = it.time
+                map[from[3]] = it.interviewReference
+                adapterData.add(map)
             }
-        c.close()
-        dbh.close()
+
+            val referencesList = allInterviews.map { it.interviewReference }
+            referenceList.addAll(referencesList)
+
+            listViewInterview.adapter = SimpleAdapter(
+                studentViewModel.getApplication(),
+                adapterData,
+                R.layout.interview_card,
+                from,
+                to
+            )
+
+            listViewInterview.onItemClickListener =
+                AdapterView.OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
+//                    startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position]))) // fixme: неправильно реализован
+                    showToast("тип переход по клику")
+                }
+        }
     }
 
     private fun classCardCreate() {
@@ -228,13 +241,11 @@ class StudentActivity : AppCompatActivity() {
         timeText.text = "12:00"
     }
 
-    //endregion
     //region Auxiliary Methods
-    private fun formatLocation(location: Location?): String {
-        return if (location == null) ""
-        else String.format(
-            "lat = %1$.6f, lon = %2$.6f", location.latitude, location.longitude
-        )
+    private fun formatLocation(location: Location?) = when (location) {
+
+        null -> ""
+        else -> String.format("lat = %1$.6f, lon = %2$.6f", location.latitude, location.longitude) // fixme
     }
 
     @SuppressLint("MissingPermission")
@@ -245,7 +256,9 @@ class StudentActivity : AppCompatActivity() {
         }
         requestLocationUpdateMade = true
     }
-    //endregion
+
+    private fun String.isValidUrl() = URLUtil.isValidUrl(this)
+        .not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 }

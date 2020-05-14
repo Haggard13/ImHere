@@ -49,7 +49,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
                     showToast("Укажите ссылку")
                     return@launch
                 }
-                isReferenceValid().not() -> {
+                interviewReference.isReferenceValid().not() -> {
                     showToast("Ссылка некорректна")
                     return@launch
                 }
@@ -95,21 +95,21 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
     //Проверка ссылки на форму
     // TODO: порефачить
-    private fun isReferenceValid(): Boolean {
-        val regexShort = Regex("""https://forms\.gle/.+""")
-        val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform\?usp=sf_link""")
-        return (interviewReference!!.matches(regexShort) || interviewReference!!.matches(regexLong)) && URLUtil.isValidUrl(interviewReference)
+    private fun String.isReferenceValid(): Boolean {
+        val regexShort = Regex("""https://forms\.gle/.+""") // fixme
+        val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform\?usp=sf_link""") // fixme:
+        // паттерн не всегда корректно срабатывает
+        // пример - https://docs.google.com/forms/d/e/1FAIpQLSf_Z1OkM1lFStBPrQP1lNNv6KnvEyQVNRz61HbeQ-l8unafLw/viewform
+        return (matches(regexShort) || matches(regexLong)) && URLUtil.isValidUrl(interviewReference)
     }
 
     //Получение фильтра для выбора получателей
-    // todo: рефачить
-    private fun getStudentFilter(): String {
-        if (switchAllStudents.isChecked) return "682" // todo: const
-        val filter = StringBuilder()
-        filter.append(spinnerCourses.selectedItemPosition)
-        filter.append(spinnerInstitutions.selectedItemPosition)
-        filter.append(spinnerStudentsUnion.selectedItemPosition)
-        return filter.toString()
+    private fun getStudentFilter() = when (switchAllStudents.isChecked) {
+
+        true -> "682"
+        else -> "${spinnerCourses.selectedItemPosition}" +
+                "${spinnerInstitutions.selectedItemPosition}" +
+                "${spinnerStudentsUnion.selectedItemPosition}"
     }
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
