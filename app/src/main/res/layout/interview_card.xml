@@ -6,11 +6,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#07373737"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteY="14dp">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/interviewNameText"

@@ -1,10 +1,16 @@
-package com.ehDev.imHere
+package com.ehDev.imHere.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.*
+import com.ehDev.imHere.R
+import com.ehDev.imHere.data.PersonType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PreviewActivity : AppCompatActivity() {
 
@@ -28,11 +34,11 @@ class PreviewActivity : AppCompatActivity() {
 
                 when (sp.contains("authentication") && sp.getBoolean("authentication", false)) {
 
-                    false -> startActivity(Intent(this@PreviewActivity, LoginActivity::class.java))
+                    false -> startActivityIntent(LoginActivity::class.java)
 
-                    true -> when (sp.getInt("status", 2) == 0) {
-                        true -> startActivity(Intent(this@PreviewActivity, StudentActivity::class.java))
-                        else -> startActivity(Intent(this@PreviewActivity, AddInterviewActivity::class.java))
+                    true -> when (sp.getString("personType", PersonType.STUDENT.name) == PersonType.STUDENT.name) {
+                        true -> startActivityIntent(StudentActivity::class.java)
+                        else -> startActivityIntent(AddInterviewActivity::class.java)
                     }
                 }
 
@@ -40,4 +46,6 @@ class PreviewActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun startActivityIntent(activity: Class<out Any>) = startActivity(Intent(this, activity))
 }
