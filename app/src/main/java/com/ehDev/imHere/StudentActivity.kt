@@ -42,6 +42,7 @@ class StudentActivity : AppCompatActivity() {
 
     // TODO: вынести логику
     private var locationListener: LocationListener = object : LocationListener {
+
         override fun onLocationChanged(location: Location) {
             locationStudent = location
         }

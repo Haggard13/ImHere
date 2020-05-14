@@ -1,20 +1,27 @@
 package com.ehDev.imHere
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteConstraintException
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.webkit.URLUtil
 import android.widget.*
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.ehDev.imHere.db.entity.InterviewEntity
+import com.ehDev.imHere.extensions.textAsString
+import com.ehDev.imHere.vm.AddInterviewViewModel
 import kotlinx.android.synthetic.main.activity_add_interview.*
+import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 
 class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {
 
-    private var reference: String? = null
+    private lateinit var addInterviewViewModel: AddInterviewViewModel
+    private var interviewReference: String? = null
 
     // TODO: разнести логику
     @SuppressLint("ResourceType")
@@ -22,43 +29,47 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_interview)
 
+        addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
+
         spinnerCourses.setSelection(6)
         spinnerInstitutions.setSelection(8)
         spinnerStudentsUnion.setSelection(2)
         setStateSpinner(false)
+
         switchAllStudents.setOnCheckedChangeListener(this)
     }
 
     fun onAddInterviewBtnClick(v: View) {
+        addInterviewViewModel.viewModelScope.launch {
+            val interviewReference = editTextReference.textAsString
 
-        reference = editTextReference!!.text.toString()
-        when {
-            reference.isNullOrEmpty() -> {
-                Toast.makeText(this, "Укажите ссылку", Toast.LENGTH_LONG).show()
-                return
+            when {
+                interviewReference.isNullOrEmpty() -> {
+                    showToast("Укажите ссылку")
+                    return@launch
+                }
+                isReferenceValid().not() -> {
+                    showToast("Ссылка некорректна")
+                    return@launch
+                }
             }
-            !tryReference() -> {
-                Toast.makeText(this, "Ссылка некорректна", Toast.LENGTH_LONG).show()
-                return
+
+            val interview = InterviewEntity(
+                interviewReference = interviewReference,
+                interviewer = editTextAuthor.textAsString,
+                interviewee = editTextName.textAsString,
+                filter = getStudentFilter(),
+                time = editTextTime.textAsString
+            )
+
+            try {
+                addInterviewViewModel.insertInterview(interview)
+            } catch (error: SQLiteConstraintException) {
+                showToast("Опрос уже существует")
+                return@launch
             }
+            showToast("Опрос успешно добавлен")
         }
-        val dbh = DataBaseHelper(this)
-        val db = dbh.writableDatabase
-        val cv = ContentValues()
-        with(cv) {
-            put("interview", reference)
-            put("filter", getStudentFilter())
-            put("who", editTextAuthor!!.text.toString())
-            put("name", editTextName!!.text.toString())
-            put("time", editTextTime!!.text.toString())
-        }
-        if(db.insert("interviewTable", null, cv) == (-1).toLong()) {
-            Toast.makeText(this, "Опрос уже существует", Toast.LENGTH_LONG).show()
-            dbh.close()
-            return
-        }
-        dbh.close()
-        Toast.makeText(this, "Опрос успешно добавлен", Toast.LENGTH_LONG).show()
     }
 
     fun onExitInterviewBtnClick(v: View) {
@@ -69,7 +80,11 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         super@AddInterviewActivity.finish()
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) = if(isChecked) setStateSpinner(false) else setStateSpinner(true)
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) = when (isChecked) {
+
+        true -> setStateSpinner(false)
+        false -> setStateSpinner(true)
+    }
 
     private fun setStateSpinner(state: Boolean){
         spinnerCourses.isEnabled = state
@@ -79,10 +94,10 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
     //Проверка ссылки на форму
     // TODO: порефачить
-    private fun tryReference(): Boolean {
+    private fun isReferenceValid(): Boolean {
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform\?usp=sf_link""")
-        return (reference!!.matches(regexShort) || reference!!.matches(regexLong)) && URLUtil.isValidUrl(reference)
+        return (interviewReference!!.matches(regexShort) || interviewReference!!.matches(regexLong)) && URLUtil.isValidUrl(interviewReference)
     }
 
     //Получение фильтра для выбора получателей
@@ -95,4 +110,6 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         filter.append(spinnerStudentsUnion.selectedItemPosition)
         return filter.toString()
     }
+
+    private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 }

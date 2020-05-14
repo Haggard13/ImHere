@@ -2,7 +2,7 @@ package com.ehDev.imHere.repository
 
 import com.ehDev.imHere.db.dao.AccountDao
 
-class UrfuRepository(
+class AccountRepository(
     private val accountDao: AccountDao
 ) {
 

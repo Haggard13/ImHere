@@ -6,13 +6,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ehDev.imHere.db.dao.AccountDao
+import com.ehDev.imHere.db.dao.InterviewDao
 import com.ehDev.imHere.db.entity.AccountEntity
+import com.ehDev.imHere.db.entity.InterviewEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
     entities = [
-        AccountEntity::class
+        AccountEntity::class,
+        InterviewEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 abstract class UrfuRoomDatabase : RoomDatabase() {
 
     abstract fun accountDao(): AccountDao
+    abstract fun interviewDao(): InterviewDao
 
     companion object {
 
@@ -57,25 +61,43 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
 
             INSTANCE?.let { database ->
                 scope.launch {
-                    for (index in FakeDataHolder.login.indices) {
-
-                        val fakeAccount = AccountEntity(
-
-                            login = FakeDataHolder.login[index],
-                            password = FakeDataHolder.password[index],
-                            status = index.calculateStatus(),
-                            filter = FakeDataHolder.filter[index]
-                        )
-
-                        database.accountDao().insert(fakeAccount)
-                    }
+                    fillAccountTableWithFakeData(database)
                 }
+            }
+        }
+
+        private suspend fun fillAccountTableWithFakeData(database: UrfuRoomDatabase) {
+
+            for (index in FakeDataHolder.login.indices) {
+
+                val fakeAccount = AccountEntity(
+
+                    login = FakeDataHolder.login[index],
+                    password = FakeDataHolder.password[index],
+                    status = index.calculateStatus(),
+                    filter = FakeDataHolder.filter[index]
+                )
+
+                database.accountDao().insert(fakeAccount)
             }
         }
 
         private fun Int.calculateStatus() = when (this) {
             2 -> "1"
             else -> "0"
+        }
+    }
+
+    private class InterviewDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+
+            INSTANCE?.let { database ->
+                scope.launch {
+
+                }
+            }
         }
     }
 }
