@@ -5,9 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.ehDev.imHere.data.PersonType
 import com.ehDev.imHere.db.dao.AccountDao
+import com.ehDev.imHere.db.dao.InstitutionDao
 import com.ehDev.imHere.db.dao.InterviewDao
 import com.ehDev.imHere.db.entity.AccountEntity
+import com.ehDev.imHere.db.entity.InstitutionEntity
 import com.ehDev.imHere.db.entity.InterviewEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -15,7 +18,8 @@ import kotlinx.coroutines.launch
 @Database(
     entities = [
         AccountEntity::class,
-        InterviewEntity::class
+        InterviewEntity::class,
+        InstitutionEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -24,6 +28,7 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
 
     abstract fun accountDao(): AccountDao
     abstract fun interviewDao(): InterviewDao
+    abstract fun institutionDao(): InstitutionDao
 
     companion object {
 
@@ -50,7 +55,8 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
             context,
             UrfuRoomDatabase::class.java,
             "urfu_database"
-        ).addCallback(AccountDatabaseCallback(scope = scope))
+        ).addCallback(AccountDatabaseCallback(scope))
+            .addCallback(InstitutionDatabaseCallback(scope))
             .build()
     }
 
@@ -74,7 +80,7 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
 
                     login = FakeDataHolder.login[index],
                     password = FakeDataHolder.password[index],
-                    status = index.calculateStatus(),
+                    personType = FakeDataHolder.login[index].calculatePersonType(),
                     filter = FakeDataHolder.filter[index]
                 )
 
@@ -82,21 +88,36 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
             }
         }
 
-        private fun Int.calculateStatus() = when (this) {
-            2 -> "1"
-            else -> "0"
+        private fun String.calculatePersonType() = when (this) {
+            "admin" -> PersonType.TEACHER.name
+            else -> PersonType.STUDENT.name
         }
     }
 
-    private class InterviewDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+    private class InstitutionDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
 
             INSTANCE?.let { database ->
                 scope.launch {
-
+                    fillInstitutionTableWithFakeData(database)
                 }
+            }
+        }
+
+        private suspend fun fillInstitutionTableWithFakeData(database: UrfuRoomDatabase) {
+
+            for (index in FakeDataHolder.institutions.indices) {
+
+                val fakeInstitution = InstitutionEntity(
+
+                    institution = FakeDataHolder.institutions[index],
+                    latitude = FakeDataHolder.latitude[index],
+                    longitude = FakeDataHolder.longitude[index]
+                )
+
+                database.institutionDao().insert(fakeInstitution)
             }
         }
     }

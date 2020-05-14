@@ -30,7 +30,7 @@ class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
 
         with(sp.edit()) {
             putBoolean("authentication", true)
-            putString("status", account.status)
+            putString("personType", account.personType)
             putString("filter", account.filter)
             apply()
         }

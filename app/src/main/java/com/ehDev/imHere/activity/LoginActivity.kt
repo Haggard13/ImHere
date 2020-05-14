@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
+import com.ehDev.imHere.data.PersonType
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.vm.LoginViewModel
 import kotlinx.android.synthetic.main.activity_login.*
@@ -39,8 +40,8 @@ class LoginActivity : AppCompatActivity() {
 
             loginViewModel.saveAccountToSharedPrefs(account)
 
-            val activity = when (account.status) {
-                "1" -> AddInterviewActivity::class.java
+            val activity = when (account.personType) {
+                PersonType.TEACHER.name -> AddInterviewActivity::class.java
                 else -> StudentActivity::class.java
             }
             startActivityIntent(activity)
