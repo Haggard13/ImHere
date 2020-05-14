@@ -1,4 +1,4 @@
-package com.ehDev.imHere
+package com.ehDev.imHere.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ehDev.imHere.R
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.vm.LoginViewModel
 import kotlinx.android.synthetic.main.activity_login.*

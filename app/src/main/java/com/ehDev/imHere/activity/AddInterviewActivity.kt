@@ -1,4 +1,4 @@
-package com.ehDev.imHere
+package com.ehDev.imHere.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,6 +11,7 @@ import android.webkit.URLUtil
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ehDev.imHere.R
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.textAsString
 import com.ehDev.imHere.vm.AddInterviewViewModel

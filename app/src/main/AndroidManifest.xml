@@ -14,11 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.ehDev.imHere.AddInterviewActivity"
+            android:name="com.ehDev.imHere.activity.AddInterviewActivity"
             android:theme="@style/SpinnerStyle" />
-        <activity android:name="com.ehDev.imHere.LoginActivity" />
+        <activity android:name="com.ehDev.imHere.activity.LoginActivity" />
         <activity
-            android:name="com.ehDev.imHere.PreviewActivity"
+            android:name="com.ehDev.imHere.activity.PreviewActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.ehDev.imHere.StudentActivity"
+            android:name="com.ehDev.imHere.activity.StudentActivity"
             android:label="I\&apos;m Here"
             android:theme="@style/AppTheme" />
     </application>

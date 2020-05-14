@@ -1,4 +1,4 @@
-package com.ehDev.imHere
+package com.ehDev.imHere.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -21,6 +21,8 @@ import android.widget.TabHost.TabSpec
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.ehDev.imHere.DataBaseHelper
+import com.ehDev.imHere.R
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -205,7 +207,8 @@ class StudentActivity : AppCompatActivity() {
             if (referenceList[0].isEmpty()) referenceList[0] = c.getString(c.getColumnIndex("interview"))
             else referenceList.add(c.getString(c.getColumnIndex("interview")))
         }
-        listViewInterview.adapter = SimpleAdapter(this, data, R.layout.interview_card, from, to)
+        listViewInterview.adapter = SimpleAdapter(this, data,
+                                                  R.layout.interview_card, from, to)
         listViewInterview.onItemClickListener =
             AdapterView.OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
                 run {

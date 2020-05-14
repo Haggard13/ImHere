@@ -1,9 +1,10 @@
-package com.ehDev.imHere
+package com.ehDev.imHere.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.ehDev.imHere.R
 import kotlinx.coroutines.*
 
 class PreviewActivity : AppCompatActivity() {
