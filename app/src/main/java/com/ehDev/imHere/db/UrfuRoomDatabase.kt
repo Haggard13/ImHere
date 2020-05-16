@@ -9,17 +9,21 @@ import com.ehDev.imHere.data.PersonType
 import com.ehDev.imHere.db.dao.AccountDao
 import com.ehDev.imHere.db.dao.InstitutionDao
 import com.ehDev.imHere.db.dao.InterviewDao
+import com.ehDev.imHere.db.dao.ScheduleDao
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.db.entity.InstitutionEntity
 import com.ehDev.imHere.db.entity.InterviewEntity
+import com.ehDev.imHere.db.entity.ScheduleEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.sql.Date
 
 @Database(
     entities = [
         AccountEntity::class,
         InterviewEntity::class,
-        InstitutionEntity::class
+        InstitutionEntity::class,
+        ScheduleEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -29,6 +33,7 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun interviewDao(): InterviewDao
     abstract fun institutionDao(): InstitutionDao
+    abstract fun scheduleDao(): ScheduleDao
 
     companion object {
 
@@ -118,6 +123,35 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
                 )
 
                 database.institutionDao().insert(fakeInstitution)
+            }
+        }
+    }
+
+    private class ScheduleDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+
+            INSTANCE?.let { database ->
+                scope.launch {
+                    fillScheduleTableWithFakeData(database)
+                }
+            }
+        }
+
+        private suspend fun fillScheduleTableWithFakeData(database: UrfuRoomDatabase) {
+
+            for (index in FakeDataHolder.date.indices) {
+
+                val fakeSchedule = ScheduleEntity(
+                        date = FakeDataHolder.date[index],
+                        number = FakeDataHolder.number[index],
+                        lecturer = FakeDataHolder.lecturer[index],
+                        type = FakeDataHolder.type[index],
+                        auditorium = FakeDataHolder.auditorium[index]
+                )
+
+                database.scheduleDao().insert(fakeSchedule)
             }
         }
     }
