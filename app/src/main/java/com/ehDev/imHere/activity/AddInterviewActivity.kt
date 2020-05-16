@@ -97,7 +97,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     // TODO: порефачить
     private fun String.isReferenceValid(): Boolean {
         val regexShort = Regex("""https://forms\.gle/.+""") // fixme
-        val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform\?usp=sf_link""") // fixme:
+        val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""") // fixme:
         // паттерн не всегда корректно срабатывает
         // пример - https://docs.google.com/forms/d/e/1FAIpQLSf_Z1OkM1lFStBPrQP1lNNv6KnvEyQVNRz61HbeQ-l8unafLw/viewform
         return ((matches(regexShort) || matches(regexLong)) && URLUtil.isValidUrl(interviewReference))
