@@ -64,7 +64,7 @@ object FakeDataHolder {
         "540", "541", "550", "551", "560", "561", "570", "571"
     )
 
-    var institutions = arrayOf("IRIT-RTF", "GUK", "TEPLOFAK", "VSHEM", "STROYFAK", "HIMFAK")
+    var institutions = arrayOf("Р", "ГУК", "Т", "Э", "С", "Х")
 
     var latitude = doubleArrayOf(
         56.840751353604674, 56.843914249505055, 56.8424766026804, 56.843110347677786, 56.84516994481896,
@@ -75,17 +75,18 @@ object FakeDataHolder {
         60.649048089981086
     )
 
-    //TODO допилить данные
-    var date = arrayOf(Date(2020, 5, 18, 12, 0),
-            Date(2020, 5, 19, 12, 0),
-            Date(2020, 5, 20, 12, 0),
-            Date(2020, 5, 21, 12, 0))
+    var date = arrayOf("5, 18, 12, 0",
+            "5, 19, 12, 0",
+            "5, 20, 12, 0",
+            "5, 21, 12, 0")
 
-    var lecturer = arrayOf("","","","")
+    var lecturer = arrayOf("Рыжкова Н.Г.", "Онлайн-курс", "Борич М.А.", "Чирышев Ю.В.")
 
-    var auditorium = arrayOf("","","","")
+    var auditorium = arrayOf("ГУК-404", "Онлайн-курс", "С-309", "Р-125")
 
-    var type = arrayOf("Лекция", "Онлайн-курс", "Пркатика", "Лекция")
+    var type = arrayOf("Лекция", "Онлайн-курс", "Пркатика", "Практика")
 
     var number = intArrayOf(3, 3, 3, 3)
+
+    var name = arrayOf("Математический анализ", "Философия", "Алгебра и геометрия", "Программирование")
 }

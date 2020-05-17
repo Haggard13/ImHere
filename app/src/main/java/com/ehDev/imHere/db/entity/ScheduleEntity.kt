@@ -8,7 +8,7 @@ import java.util.Date
 data class ScheduleEntity(
 
         @PrimaryKey
-        val date: Date,
+        val date: String,
 
         val number: Int,
 
@@ -16,5 +16,7 @@ data class ScheduleEntity(
 
         val auditorium: String,
 
-        val type: String
+        val type: String,
+
+        val name: String
 )

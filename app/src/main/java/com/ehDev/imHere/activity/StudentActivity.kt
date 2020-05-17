@@ -29,8 +29,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 
 class StudentActivity : AppCompatActivity() {
 
@@ -63,7 +62,6 @@ class StudentActivity : AppCompatActivity() {
         override fun onProviderDisabled(provider: String) {}
     }
 
-    //endregion
     //TODO: разнести
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,7 +96,7 @@ class StudentActivity : AppCompatActivity() {
 
         //endregion
         wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-        classCardCreate() //Заполнение всех View
+        //classCardCreate() //fixme пока не работает
         tabHostCreate()
         listViewCreate()
     }
@@ -159,7 +157,6 @@ class StudentActivity : AppCompatActivity() {
         super@StudentActivity.finish()
     }
 
-    //region Methods For Filling Layout
     // TODO: ну тут явно чет не так
     private fun tabHostCreate() {
         val tabHost = findViewById<TabHost>(R.id.tabhost)
@@ -233,15 +230,23 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun classCardCreate() {
-        classNameText.text = "Математика"
-        classNumberText.text = "3"
-        classTypeText.text = "Лекция"
-        auditoryText.text = "ГУК-404"
-        lecturerText.text = "Рыжкова Н. Г."
-        timeText.text = "12:00"
+        studentViewModel.viewModelScope.launch {
+            val schedule = studentViewModel.getSchedule()
+            //lateinit var pair: ScheduleEntity
+            var pair = schedule[0]
+            schedule.forEach {
+                var date = it.date.split(',')
+                var fakeDate = getFakeDate(date)
+            }
+            classNumberText.text = pair.number.toString()
+            classNameText.text = pair.name
+            classTypeText.text = pair.type
+            auditoryText.text = pair.auditorium
+            lecturerText.text = pair.lecturer
+            timeText.text = pair.date.split(',')[2] + ":" + pair.date.split(',')[3]
+        }
     }
 
-    //region Auxiliary Methods
     private fun formatLocation(location: Location?) = when (location) {
 
         null -> ""
@@ -261,4 +266,17 @@ class StudentActivity : AppCompatActivity() {
         .not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+
+    private fun getFakeDate(date: List<String>) : List<String> {
+        if (Integer.parseInt(date[3]) < 30) return listOf(
+                date[0],
+                date[1],
+                (Integer.parseInt(date[2]) - 2).toString(),
+                (Integer.parseInt(date[3]) + 30).toString())
+        else return listOf(
+                date[0],
+                date[1],
+                (Integer.parseInt(date[2]) - 1).toString(),
+                (Integer.parseInt(date[3]) - 30).toString())
+    }
 }

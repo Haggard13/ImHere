@@ -16,7 +16,6 @@ import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.db.entity.ScheduleEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.sql.Date
 
 @Database(
     entities = [
@@ -62,7 +61,8 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
             "urfu_database"
         ).addCallback(AccountDatabaseCallback(scope))
             .addCallback(InstitutionDatabaseCallback(scope))
-            .build()
+                .addCallback(ScheduleDatabaseCallback(scope))
+                .build()
     }
 
     private class AccountDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
@@ -148,7 +148,8 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
                         number = FakeDataHolder.number[index],
                         lecturer = FakeDataHolder.lecturer[index],
                         type = FakeDataHolder.type[index],
-                        auditorium = FakeDataHolder.auditorium[index]
+                        auditorium = FakeDataHolder.auditorium[index],
+                        name = FakeDataHolder.name[index]
                 )
 
                 database.scheduleDao().insert(fakeSchedule)
