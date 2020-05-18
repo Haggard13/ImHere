@@ -31,6 +31,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
+private const val MONTH = 0
+private const val DAY = 1
+private const val HOUR = 2
+private const val MINUTE = 3
+
 class StudentActivity : AppCompatActivity() {
 
     private lateinit var studentViewModel: StudentViewModel
@@ -96,7 +101,7 @@ class StudentActivity : AppCompatActivity() {
 
         //endregion
         wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-        //classCardCreate() //fixme пока не работает
+        classCardCreate()
         tabHostCreate()
         listViewCreate()
     }
@@ -173,12 +178,11 @@ class StudentActivity : AppCompatActivity() {
         tabHost.setCurrentTabByTag("tag1")
     }
 
-    // TODO: жду Room и переписываю
     private fun listViewCreate() {
         studentViewModel.viewModelScope.launch {
 
 //            val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
-            val filter = "682"
+            val filter = "682" // fixme: это для тестов, потом заменить на строку выше
             val adapterData = ArrayList<Map<String, Any?>>()
             var map: MutableMap<String, Any?>
 
@@ -200,6 +204,7 @@ class StudentActivity : AppCompatActivity() {
                 .filter { it.filter == filter }
                 .filter { it.filter == "682" }
 
+            // todo: переписать и сделать норм адаптер
             allInterviews.forEach {
 
                 map = HashMap()
@@ -213,6 +218,7 @@ class StudentActivity : AppCompatActivity() {
             val referencesList = allInterviews.map { it.interviewReference }
             referenceList.addAll(referencesList)
 
+            // todo: переписать на норм адаптер
             listViewInterview.adapter = SimpleAdapter(
                 studentViewModel.getApplication(),
                 adapterData,
@@ -232,12 +238,13 @@ class StudentActivity : AppCompatActivity() {
     private fun classCardCreate() {
         studentViewModel.viewModelScope.launch {
             val schedule = studentViewModel.getSchedule()
-            //lateinit var pair: ScheduleEntity
-            var pair = schedule[0]
+            val pair = schedule[0]
+
             schedule.forEach {
-                var date = it.date.split(',')
+                val date = it.date.replace(" ", "").split(',')
                 var fakeDate = getFakeDate(date)
             }
+
             classNumberText.text = pair.number.toString()
             classNameText.text = pair.name
             classTypeText.text = pair.type
@@ -250,7 +257,9 @@ class StudentActivity : AppCompatActivity() {
     private fun formatLocation(location: Location?) = when (location) {
 
         null -> ""
-        else -> String.format("lat = %1$.6f, lon = %2$.6f", location.latitude, location.longitude) // fixme
+        else -> String.format(
+            "lat = %1$.6f, lon = %2$.6f", location.latitude, location.longitude
+        ) // todo: обдумать как переписать
     }
 
     @SuppressLint("MissingPermission")
@@ -267,16 +276,19 @@ class StudentActivity : AppCompatActivity() {
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
-    private fun getFakeDate(date: List<String>) : List<String> {
-        if (Integer.parseInt(date[3]) < 30) return listOf(
-                date[0],
-                date[1],
-                (Integer.parseInt(date[2]) - 2).toString(),
-                (Integer.parseInt(date[3]) + 30).toString())
-        else return listOf(
-                date[0],
-                date[1],
-                (Integer.parseInt(date[2]) - 1).toString(),
-                (Integer.parseInt(date[3]) - 30).toString())
+    private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTE]) < 30) {
+
+        true -> listOf(
+            date[MONTH],
+            date[DAY],
+            (Integer.parseInt(date[HOUR]) - 2).toString(),
+            (Integer.parseInt(date[MINUTE]) + 30).toString()
+        )
+        else -> listOf(
+            date[MONTH],
+            date[DAY],
+            (Integer.parseInt(date[HOUR]) - 1).toString(),
+            (Integer.parseInt(date[MINUTE]) - 30).toString()
+        )
     }
 }

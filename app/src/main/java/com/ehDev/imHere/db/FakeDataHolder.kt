@@ -1,7 +1,5 @@
 package com.ehDev.imHere.db
 
-import java.util.Date
-
 object FakeDataHolder {
 
     val login = arrayOf(
@@ -75,10 +73,12 @@ object FakeDataHolder {
         60.649048089981086
     )
 
-    var date = arrayOf("5, 18, 12, 0",
-            "5, 19, 12, 0",
-            "5, 20, 12, 0",
-            "5, 21, 12, 0")
+    var date = arrayOf(
+        "5, 18, 12, 00",
+        "5, 19, 12, 00",
+        "5, 20, 12, 00",
+        "5, 21, 12, 00"
+    )
 
     var lecturer = arrayOf("Рыжкова Н.Г.", "Онлайн-курс", "Борич М.А.", "Чирышев Ю.В.")
 
