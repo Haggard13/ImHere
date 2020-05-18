@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ehDev.imHere.R
+import com.ehDev.imHere.data.HelpMethodsForScheduleRecycler
 import com.ehDev.imHere.db.entity.ScheduleEntity
 import kotlinx.android.synthetic.main.schedule_item_view.view.*
 
@@ -38,15 +39,18 @@ class ScheduleRecyclerViewAdapter(
         private val auditoryTV = itemView.auditory_tv
         private val lecturerTV = itemView.lecturer_tv
         private val pairTime = itemView.time_tv
+        private val classImage = itemView.class_image
 
         fun bind(scheduleItem: ScheduleEntity) {
 
+            val helpMethods = HelpMethodsForScheduleRecycler //объект с методами для помощи в заполнении ресайклера
             classNumberTV.text = scheduleItem.number.toString()
             classNameTV.text = scheduleItem.name
             classTypeTV.text = scheduleItem.type
             auditoryTV.text = scheduleItem.auditorium
             lecturerTV.text = scheduleItem.lecturer
             pairTime.text = scheduleItem.date.mapPairTime()
+            classImage.setImageResource(helpMethods.getPrefixResId(helpMethods.getPrefix(scheduleItem.name)))
         }
 
         private fun String.mapPairTime() = "${split(',')[HOURS]}:${split(',')[MINUTES]}"

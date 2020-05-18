@@ -18,5 +18,7 @@ data class ScheduleEntity(
 
         val type: String,
 
-        val name: String
+        val name: String,
+
+        val visit: String
 )
