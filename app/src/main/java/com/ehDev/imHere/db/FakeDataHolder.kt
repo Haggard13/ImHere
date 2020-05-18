@@ -73,6 +73,7 @@ object FakeDataHolder {
         60.649048089981086
     )
 
+    //region Расписание
     var date = arrayOf(
         "5, 18, 12, 00",
         "5, 19, 8, 30",
@@ -103,6 +104,7 @@ object FakeDataHolder {
             "Б-123",
             "С-309",
             "Р-125")
+    //fixme аудитории должны начинаться с префиксов из institutions
 
     var type = arrayOf(
             "Лекция",
@@ -132,4 +134,5 @@ object FakeDataHolder {
             "Философия",
             "Алгебра и геометрия",
             "Программирование")
+    //endregion
 }
