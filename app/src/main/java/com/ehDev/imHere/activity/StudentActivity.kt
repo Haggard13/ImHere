@@ -28,7 +28,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Calendar
+import java.util.GregorianCalendar
 
 private const val MONTH = 0
 private const val DAY = 1
@@ -106,13 +107,8 @@ class StudentActivity : AppCompatActivity() {
     fun onCheckBtnClick(v: View) {
         studentViewModel.viewModelScope.launch {
 
-            if (ActivityCompat.checkSelfPermission(
-                    this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-                )
+            if (studentViewModel.checkLocationPermission() != PackageManager.PERMISSION_GRANTED) {
+                studentViewModel.requestLocationPermission(this@StudentActivity)
                 return@launch
             }
 
@@ -128,13 +124,8 @@ class StudentActivity : AppCompatActivity() {
                     delay(50)
             }
 
-            if (ActivityCompat.checkSelfPermission(
-                    this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-                )
+            if (studentViewModel.checkLocationPermission() != PackageManager.PERMISSION_GRANTED) {
+                studentViewModel.requestLocationPermission(this@StudentActivity)
                 return@launch
             }
 
@@ -204,12 +195,12 @@ class StudentActivity : AppCompatActivity() {
         studentViewModel.viewModelScope.launch {
 
             val schedule = studentViewModel.getSchedule()
-            val todayDate = Date()
+            val todayDate = GregorianCalendar()
             val todayDateList = listOf(
-                    (todayDate.month + 1).toString(),
-                    todayDate.date.toString(),
-                    todayDate.hours.toString(),
-                    todayDate.minutes.toString()
+                (todayDate.get(Calendar.MONTH) + 1).toString(),
+                todayDate.get(Calendar.DAY_OF_MONTH).toString(),
+                todayDate.get(Calendar.HOUR_OF_DAY).toString(),
+                todayDate.get(Calendar.MINUTE).toString()
             )
             //var fakeDate = getFakeDate(date) // todo: исправить
             val scheduleOnThisDay = schedule.filter {
@@ -218,8 +209,8 @@ class StudentActivity : AppCompatActivity() {
 
             schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)
         }
-            //В карточке пары должна была быть только следующая пара. Т.к. теперь ресайклер,
-            // то я комменчу(вдруг пригодится) getFakeDate и добавляю фильтр для расписания на текущий день
+        //В карточке пары должна была быть только следующая пара. Т.к. теперь ресайклер,
+        // то я комменчу(вдруг пригодится) getFakeDate и добавляю фильтр для расписания на текущий день
     }
 
     private fun formatLocation(location: Location?) = when (location) {
@@ -260,6 +251,6 @@ class StudentActivity : AppCompatActivity() {
         )
     }*/
 
-    private fun filterForSchedule(date: List<String>, todayDate: List<String>) : Boolean =
-            date[MONTH] == todayDate[MONTH] && date[DAY] == todayDate[DAY]
+    private fun filterForSchedule(date: List<String>, todayDate: List<String>): Boolean =
+        date[MONTH] == todayDate[MONTH] && date[DAY] == todayDate[DAY]
 }

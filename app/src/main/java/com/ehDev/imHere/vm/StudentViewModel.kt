@@ -44,4 +44,9 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
         1
     )
+
+    fun checkLocationPermission() = ActivityCompat.checkSelfPermission(
+        app,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    )
 }
