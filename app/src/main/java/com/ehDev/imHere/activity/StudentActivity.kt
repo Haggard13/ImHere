@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
+import com.ehDev.imHere.adapter.ScheduleAdapter
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +30,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.ArrayList
+import java.util.HashMap
 
 private const val MONTH = 0
 private const val DAY = 1
-private const val HOUR = 2
-private const val MINUTE = 3
+private const val HOURS = 2
+private const val MINUTES = 3
 
 class StudentActivity : AppCompatActivity() {
 
@@ -147,8 +149,8 @@ class StudentActivity : AppCompatActivity() {
             }
             showToast(toastText)
 
-            locationText.text = formatLocation(locationStudent)
-            wifiText.text = wifiMgr?.connectionInfo?.ssid
+            location_tv.text = formatLocation(locationStudent)
+            wifi_tv.text = wifiMgr?.connectionInfo?.ssid
             progressBar.visibility = View.INVISIBLE
             check_btn.isClickable = true
         }
@@ -237,20 +239,15 @@ class StudentActivity : AppCompatActivity() {
 
     private fun classCardCreate() {
         studentViewModel.viewModelScope.launch {
+
             val schedule = studentViewModel.getSchedule()
-            val pair = schedule[0]
 
             schedule.forEach {
                 val date = it.date.replace(" ", "").split(',')
-                var fakeDate = getFakeDate(date)
+                var fakeDate = getFakeDate(date) // todo: исправить
             }
 
-            classNumberText.text = pair.number.toString()
-            classNameText.text = pair.name
-            classTypeText.text = pair.type
-            auditoryText.text = pair.auditorium
-            lecturerText.text = pair.lecturer
-            timeText.text = pair.date.split(',')[2] + ":" + pair.date.split(',')[3]
+            schedule_rv.adapter = ScheduleAdapter(schedule)
         }
     }
 
@@ -276,19 +273,19 @@ class StudentActivity : AppCompatActivity() {
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
-    private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTE]) < 30) {
+    private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTES]) < 30) {
 
         true -> listOf(
             date[MONTH],
             date[DAY],
-            (Integer.parseInt(date[HOUR]) - 2).toString(),
-            (Integer.parseInt(date[MINUTE]) + 30).toString()
+            (Integer.parseInt(date[HOURS]) - 2).toString(),
+            (Integer.parseInt(date[MINUTES]) + 30).toString()
         )
         else -> listOf(
             date[MONTH],
             date[DAY],
-            (Integer.parseInt(date[HOUR]) - 1).toString(),
-            (Integer.parseInt(date[MINUTE]) - 30).toString()
+            (Integer.parseInt(date[HOURS]) - 1).toString(),
+            (Integer.parseInt(date[MINUTES]) - 30).toString()
         )
     }
 }
