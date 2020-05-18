@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 private const val MONTH = 0
 private const val DAY = 1
@@ -198,14 +199,22 @@ class StudentActivity : AppCompatActivity() {
         studentViewModel.viewModelScope.launch {
 
             val schedule = studentViewModel.getSchedule()
-
-            schedule.forEach {
-                val date = it.date.replace(" ", "").split(',')
-                var fakeDate = getFakeDate(date) // todo: исправить
+            val todayDate = Date()
+            val todayDateList = listOf(
+                    (todayDate.month + 1).toString(),
+                    todayDate.date.toString(),
+                    todayDate.hours.toString(),
+                    todayDate.minutes.toString()
+            )
+            //var fakeDate = getFakeDate(date) // todo: исправить
+            val scheduleOnThisDay = schedule.filter {
+                filterForSchedule(it.date.replace(" ", "").split(","), todayDateList)//Отбирает пары только на этот день
             }
 
-            schedule_rv.adapter = ScheduleRecyclerViewAdapter(schedule)
+            schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)
         }
+            //В карточке пары должна была быть только следующая пара. Т.к. теперь ресайклер,
+            // то я комменчу(вдруг пригодится) getFakeDate и добавляю фильтр для расписания на текущий день
     }
 
     private fun formatLocation(location: Location?) = when (location) {
@@ -230,7 +239,7 @@ class StudentActivity : AppCompatActivity() {
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
-    private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTES]) < 30) {
+    /*private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTES]) < 30) {
 
         true -> listOf(
             date[MONTH],
@@ -244,5 +253,8 @@ class StudentActivity : AppCompatActivity() {
             (Integer.parseInt(date[HOURS]) - 1).toString(),
             (Integer.parseInt(date[MINUTES]) - 30).toString()
         )
-    }
+    }*/
+
+    private fun filterForSchedule(date: List<String>, todayDate: List<String>) : Boolean =
+            date[MONTH] == todayDate[MONTH] && date[DAY] == todayDate[DAY]
 }

@@ -84,7 +84,7 @@ object FakeDataHolder {
 
     var auditorium = arrayOf("ГУК-404", "Б-123", "С-309", "Р-125")
 
-    var type = arrayOf("Лекция", "Онлайн-курс", "Пркатика", "Практика")
+    var type = arrayOf("Лекция", "Онлайн-курс", "Практика", "Практика")
 
     var number = intArrayOf(3, 3, 3, 3)
 
