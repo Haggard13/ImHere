@@ -146,6 +146,13 @@ class StudentActivity : AppCompatActivity() {
             }
             showToast(toastText)
 
+            //TODO Изменить unvisited на visited если дистанция меньше 100 метров
+            //Здесь понадобится getFakeDate
+            /*when (toastText == "ЗНАНИЕ - СИЛА") {
+                true -> studentViewModel.changeState(*//*дата идущей пары*//*)
+            }*/
+            //fixme дописать
+
             location_tv.text = formatLocation(locationStudent)
             wifi_tv.text = wifiMgr?.connectionInfo?.ssid
             progressBar.visibility = View.INVISIBLE

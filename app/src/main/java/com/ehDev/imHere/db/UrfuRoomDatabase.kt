@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ehDev.imHere.data.PersonType
+import com.ehDev.imHere.data.VisitState
 import com.ehDev.imHere.db.dao.AccountDao
 import com.ehDev.imHere.db.dao.InstitutionDao
 import com.ehDev.imHere.db.dao.InterviewDao
@@ -149,7 +150,8 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
                         lecturer = FakeDataHolder.lecturer[index],
                         type = FakeDataHolder.type[index],
                         auditorium = FakeDataHolder.auditorium[index],
-                        name = FakeDataHolder.name[index]
+                        name = FakeDataHolder.name[index],
+                        visit = VisitState.UNVISITED.name
                 )
 
                 database.scheduleDao().insert(fakeSchedule)

@@ -37,6 +37,8 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
 
     suspend fun getSchedule(): List<ScheduleEntity> = scheduleRepository.getSchedule()
 
+    suspend fun changeState(date: String) = scheduleRepository.changeState(date)
+
     fun requestLocationPermission(activity: Activity) = ActivityCompat.requestPermissions(
         activity,
         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
