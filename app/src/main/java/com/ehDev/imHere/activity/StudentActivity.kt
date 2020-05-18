@@ -22,7 +22,9 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
+import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
+import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
@@ -234,6 +236,16 @@ class StudentActivity : AppCompatActivity() {
 //                    startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position]))) // fixme: неправильно реализован
                     showToast("тип переход по клику")
                 }
+
+            interview_rv.adapter = InterviewRecyclerViewAdapter(
+
+                allInterviews,
+                object : InterviewRecyclerViewAdapter.InterviewCallback {
+                    override fun onItemClicked(item: InterviewEntity) {
+                        showToast("тип переход по клику")
+                    }
+                }
+            )
         }
     }
 
