@@ -37,7 +37,6 @@ private const val MINUTES = 3
 class StudentActivity : AppCompatActivity() {
 
     private lateinit var studentViewModel: StudentViewModel
-    private var referenceList = mutableListOf("")
 
     var locationManager: LocationManager? = null
     var locationStudent: Location? = null
