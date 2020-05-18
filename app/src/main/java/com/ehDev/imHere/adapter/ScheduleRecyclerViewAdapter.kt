@@ -10,12 +10,16 @@ import kotlinx.android.synthetic.main.schedule_item_view.view.*
 
 private const val MINUTES = 3
 
-class ScheduleAdapter(private val schedule: List<ScheduleEntity>) : RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder>() {
+class ScheduleRecyclerViewAdapter(
+
+    private val schedule: List<ScheduleEntity>
+
+) : RecyclerView.Adapter<ScheduleRecyclerViewAdapter.ScheduleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleViewHolder {
 
-        val layout = LayoutInflater.from(parent.context).inflate(R.layout.schedule_item_view, parent, false)
-        return ScheduleViewHolder(layout)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.schedule_item_view, parent, false)
+        return ScheduleViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ScheduleViewHolder, position: Int) {
@@ -23,14 +27,16 @@ class ScheduleAdapter(private val schedule: List<ScheduleEntity>) : RecyclerView
         holder.bind(schedule[position])
     }
 
-    inner class ScheduleViewHolder(private val layout: View) : RecyclerView.ViewHolder(layout) {
+    override fun getItemCount(): Int = schedule.size
 
-        private val classNumberTV = layout.class_number_tv
-        private val classNameTV = layout.class_name_tv
-        private val classTypeTV = layout.class_type_tv
-        private val auditoryTV = layout.auditory_tv
-        private val lecturerTV = layout.lecturer_tv
-        private val pairTime = layout.time_tv
+    inner class ScheduleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        private val classNumberTV = itemView.class_number_tv
+        private val classNameTV = itemView.class_name_tv
+        private val classTypeTV = itemView.class_type_tv
+        private val auditoryTV = itemView.auditory_tv
+        private val lecturerTV = itemView.lecturer_tv
+        private val pairTime = itemView.time_tv
 
         fun bind(scheduleItem: ScheduleEntity) {
 
@@ -42,6 +48,4 @@ class ScheduleAdapter(private val schedule: List<ScheduleEntity>) : RecyclerView
             pairTime.text = scheduleItem.date.split(',')[2] + ":" + scheduleItem.date.split(',')[MINUTES]
         }
     }
-
-    override fun getItemCount(): Int = schedule.size
 }

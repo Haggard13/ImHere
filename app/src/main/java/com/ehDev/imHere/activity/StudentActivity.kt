@@ -22,12 +22,10 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
-import com.ehDev.imHere.adapter.ScheduleAdapter
-import com.ehDev.imHere.location.StudentLocationListener
+import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -249,7 +247,7 @@ class StudentActivity : AppCompatActivity() {
                 var fakeDate = getFakeDate(date) // todo: исправить
             }
 
-            schedule_rv.adapter = ScheduleAdapter(schedule)
+            schedule_rv.adapter = ScheduleRecyclerViewAdapter(schedule)
         }
     }
 
