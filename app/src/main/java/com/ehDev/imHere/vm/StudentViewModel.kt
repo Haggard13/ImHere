@@ -1,13 +1,15 @@
 package com.ehDev.imHere.vm
 
+import android.Manifest
+import android.app.Activity
 import android.app.Application
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.db.UrfuRoomDatabase
 import com.ehDev.imHere.db.entity.ScheduleEntity
 import com.ehDev.imHere.repository.InterviewRepository
 import com.ehDev.imHere.repository.ScheduleRepository
-import java.util.*
 
 class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
 
@@ -24,8 +26,8 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         interviewRepository = InterviewRepository(interviewDao)
 
         val scheduleDao = UrfuRoomDatabase.getDatabase(
-                context = app,
-                scope = viewModelScope
+            context = app,
+            scope = viewModelScope
         ).scheduleDao()
 
         scheduleRepository = ScheduleRepository(scheduleDao)
@@ -33,5 +35,11 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
 
     suspend fun getAllInterviews() = interviewRepository.getAllInterviews()
 
-    suspend fun getSchedule() : List<ScheduleEntity> = scheduleRepository.getSchedule()
+    suspend fun getSchedule(): List<ScheduleEntity> = scheduleRepository.getSchedule()
+
+    fun requestLocationPermission(activity: Activity) = ActivityCompat.requestPermissions(
+        activity,
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        1
+    )
 }

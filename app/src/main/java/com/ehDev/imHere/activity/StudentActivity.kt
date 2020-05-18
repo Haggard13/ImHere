@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
 import com.ehDev.imHere.adapter.ScheduleAdapter
+import com.ehDev.imHere.location.StudentLocationListener
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +51,8 @@ class StudentActivity : AppCompatActivity() {
     var wifiMgr: WifiManager? = null
 
     // TODO: вынести логику
+//    private val locationListener = StudentLocationListener(locationStudent, baseContext, locationManager)
+
     private var locationListener: LocationListener = object : LocationListener {
 
         override fun onLocationChanged(location: Location) {
@@ -85,7 +88,8 @@ class StudentActivity : AppCompatActivity() {
             latitude = 56.840750
             longitude = 60.650750
         }
-        ActivityCompat.requestPermissions(this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+
+        studentViewModel.requestLocationPermission(this)
 
         when (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
@@ -96,9 +100,7 @@ class StudentActivity : AppCompatActivity() {
                 }
             }
 
-            else -> ActivityCompat.requestPermissions(
-                this@StudentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-            )
+            else -> studentViewModel.requestLocationPermission(this)
         }
 
         //endregion
@@ -109,8 +111,8 @@ class StudentActivity : AppCompatActivity() {
     }
 
     fun onCheckBtnClick(v: View) {
+        studentViewModel.viewModelScope.launch {
 
-        GlobalScope.launch(Dispatchers.Main) {
             if (ActivityCompat.checkSelfPermission(
                     this@StudentActivity, Manifest.permission.ACCESS_FINE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
