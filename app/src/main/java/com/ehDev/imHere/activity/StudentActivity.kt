@@ -200,7 +200,7 @@ class StudentActivity : AppCompatActivity() {
             val schedule = studentViewModel.getSchedule()
 
             schedule.forEach {
-                val date = it.date.replace(" ", "").split(',')
+                val date = it.date.split(',')
                 var fakeDate = getFakeDate(date) // todo: исправить
             }
 

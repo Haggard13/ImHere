@@ -8,6 +8,7 @@ import com.ehDev.imHere.R
 import com.ehDev.imHere.db.entity.ScheduleEntity
 import kotlinx.android.synthetic.main.schedule_item_view.view.*
 
+private const val HOURS = 2
 private const val MINUTES = 3
 
 class ScheduleRecyclerViewAdapter(
@@ -45,7 +46,9 @@ class ScheduleRecyclerViewAdapter(
             classTypeTV.text = scheduleItem.type
             auditoryTV.text = scheduleItem.auditorium
             lecturerTV.text = scheduleItem.lecturer
-            pairTime.text = scheduleItem.date.split(',')[2] + ":" + scheduleItem.date.split(',')[MINUTES]
+            pairTime.text = scheduleItem.date.mapPairTime()
         }
+
+        private fun String.mapPairTime() = "${split(',')[HOURS]}:${split(',')[MINUTES]}"
     }
 }

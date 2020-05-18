@@ -144,7 +144,7 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
             for (index in FakeDataHolder.date.indices) {
 
                 val fakeSchedule = ScheduleEntity(
-                        date = FakeDataHolder.date[index],
+                        date = FakeDataHolder.date[index].replace(" ", ""),
                         number = FakeDataHolder.number[index],
                         lecturer = FakeDataHolder.lecturer[index],
                         type = FakeDataHolder.type[index],
