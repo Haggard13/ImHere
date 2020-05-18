@@ -12,8 +12,6 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.View
 import android.webkit.URLUtil
-import android.widget.AdapterView
-import android.widget.SimpleAdapter
 import android.widget.TabHost
 import android.widget.TabHost.TabSpec
 import android.widget.Toast
@@ -24,15 +22,12 @@ import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
-import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.ArrayList
-import java.util.HashMap
 
 private const val MONTH = 0
 private const val DAY = 1
@@ -187,65 +182,16 @@ class StudentActivity : AppCompatActivity() {
 
 //            val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
             val filter = "682" // fixme: это для тестов, потом заменить на строку выше
-            val adapterData = ArrayList<Map<String, Any?>>()
-            var map: MutableMap<String, Any?>
-
-            val from = arrayOf(
-                getString(R.string.attribute_name_name),
-                getString(R.string.attribute_name_who),
-                getString(R.string.attribute_name_time),
-                getString(R.string.attribute_name_reference)
-            )
-            val to = intArrayOf(
-                R.id.interviewNameText,
-                R.id.interviewWhoText,
-                R.id.interviewTimeText,
-                R.id.referenceText
-            )
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
                 .filter { it.filter == filter }
                 .filter { it.filter == "682" }
 
-            // todo: переписать и сделать норм адаптер
-            allInterviews.forEach {
-
-                map = HashMap()
-                map[from[0]] = it.interviewer
-                map[from[1]] = it.interviewee
-                map[from[2]] = it.time
-                map[from[3]] = it.interviewReference
-                adapterData.add(map)
+            interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
+//              startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position]))) // fixme: неправильно реализован
+                showToast("тип переход по клику")
             }
-
-            val referencesList = allInterviews.map { it.interviewReference }
-            referenceList.addAll(referencesList)
-
-            // todo: переписать на норм адаптер
-            listViewInterview.adapter = SimpleAdapter(
-                studentViewModel.getApplication(),
-                adapterData,
-                R.layout.interview_card,
-                from,
-                to
-            )
-
-            listViewInterview.onItemClickListener =
-                AdapterView.OnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
-//                    startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position]))) // fixme: неправильно реализован
-                    showToast("тип переход по клику")
-                }
-
-            interview_rv.adapter = InterviewRecyclerViewAdapter(
-
-                allInterviews,
-                object : InterviewRecyclerViewAdapter.InterviewCallback {
-                    override fun onItemClicked(item: InterviewEntity) {
-                        showToast("тип переход по клику")
-                    }
-                }
-            )
         }
     }
 

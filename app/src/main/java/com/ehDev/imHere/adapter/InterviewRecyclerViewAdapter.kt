@@ -3,7 +3,6 @@ package com.ehDev.imHere.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.ehDev.imHere.R
 import com.ehDev.imHere.db.entity.InterviewEntity
@@ -12,7 +11,7 @@ import kotlinx.android.synthetic.main.interview_item_view.view.*
 class InterviewRecyclerViewAdapter(
 
     private val interviews: List<InterviewEntity>,
-    private val callback: InterviewCallback
+    private val callback: () -> Unit
 
 ) : RecyclerView.Adapter<InterviewRecyclerViewAdapter.InterviewViewHolder>() {
 
@@ -43,12 +42,8 @@ class InterviewRecyclerViewAdapter(
             interviewTimeTV.text = interviewItem.time
             interviewReferenceTV.text = interviewItem.interviewReference
             itemView.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) callback.onItemClicked(interviewItem)
+                if (adapterPosition != RecyclerView.NO_POSITION) callback.invoke()
             }
         }
-    }
-
-    interface InterviewCallback {
-        fun onItemClicked(item: InterviewEntity)
     }
 }
