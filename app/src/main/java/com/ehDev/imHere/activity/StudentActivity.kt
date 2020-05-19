@@ -33,6 +33,8 @@ import java.util.GregorianCalendar
 
 private const val MONTH = 0
 private const val DAY = 1
+private const val HOURS = 2
+private const val MINUTES = 3
 
 class StudentActivity : AppCompatActivity() {
 
@@ -129,18 +131,36 @@ class StudentActivity : AppCompatActivity() {
                 return@launch
             }
 
-            val toastText = when (locationStudent!!.distanceTo(locationRTF) > 100) {
+            var toastText = when (locationStudent!!.distanceTo(locationRTF) > 100) {
                 true -> "СРОЧНО НА ПАРУ"
                 false -> "ЗНАНИЕ - СИЛА"
             }
-            showToast(toastText)
 
-            //TODO Изменить unvisited на visited если дистанция меньше 100 метров
-            //Здесь понадобится getFakeDate
-            /*when (toastText == "ЗНАНИЕ - СИЛА") {
-                true -> studentViewModel.changeState(*//*дата идущей пары*//*)
+            //TODO доделать
+            /*when (locationStudent!!.distanceTo(locationRTF) <= 100) {
+                true -> {
+                    val nowDate = getDateAsListOfString(GregorianCalendar())
+                    val fakeDate = getFakeDate(nowDate)
+                    val schedule = studentViewModel.getSchedule()
+                    val nextPairs = schedule.filter {
+                        filterForScheduleOnThisPair(it.date.replace(" ", "").split(","), fakeDate)
+                    }//Оставшиеся пары на день
+
+                    lateinit var nowPair : ScheduleEntity
+                    if (nextPairs.isEmpty()) {
+                        toastText = "На сегодня пар больше нет"
+                    }
+                    else if () {
+                        toastText = "Пара еще не началась"
+                    } //Проверка, что кнопка нажата во время пары
+                    else {
+                        studentViewModel.changeState(nowPair.date)
+                    }
+                }
+                false -> toastText = "СРОЧНО НА ПАРУ"
             }*/
-            //fixme дописать
+
+            showToast(toastText)
 
             location_tv.text = formatLocation(locationStudent)
             wifi_tv.text = wifiMgr?.connectionInfo?.ssid
@@ -181,8 +201,7 @@ class StudentActivity : AppCompatActivity() {
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
-                .filter { it.filter == filter }
-                .filter { it.filter == "682" }
+                .filter { it.filter == filter || it.filter == "682" }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
 //              startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position]))) // fixme: неправильно реализован
@@ -196,15 +215,9 @@ class StudentActivity : AppCompatActivity() {
 
             val schedule = studentViewModel.getSchedule()
             val todayDate = GregorianCalendar()
-            val todayDateList = listOf(
-                (todayDate.get(Calendar.MONTH) + 1).toString(),
-                todayDate.get(Calendar.DAY_OF_MONTH).toString(),
-                todayDate.get(Calendar.HOUR_OF_DAY).toString(),
-                todayDate.get(Calendar.MINUTE).toString()
-            )
-            //var fakeDate = getFakeDate(date) // todo: исправить
+            val todayDateList = getDateAsListOfString(todayDate)
             val scheduleOnThisDay = schedule.filter {
-                filterForSchedule(it.date.replace(" ", "").split(","), todayDateList)//Отбирает пары только на этот день
+                filterForScheduleOnThisDay(it.date.replace(" ", "").split(","), todayDateList)//Отбирает пары только на этот день
             }
 
             schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)
@@ -235,7 +248,7 @@ class StudentActivity : AppCompatActivity() {
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
-    /*private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTES]) < 30) {
+    private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTES]) < 30) {
 
         true -> listOf(
             date[MONTH],
@@ -249,8 +262,19 @@ class StudentActivity : AppCompatActivity() {
             (Integer.parseInt(date[HOURS]) - 1).toString(),
             (Integer.parseInt(date[MINUTES]) - 30).toString()
         )
-    }*/
+    }
 
-    private fun filterForSchedule(date: List<String>, todayDate: List<String>): Boolean =
+    private fun filterForScheduleOnThisDay(date: List<String>, todayDate: List<String>): Boolean =
         date[MONTH] == todayDate[MONTH] && date[DAY] == todayDate[DAY]
+
+    private fun filterForScheduleOnThisPair(date: List<String>, nowDate: List<String>): Boolean =
+            date[MONTH] == nowDate[MONTH] && date[DAY] == nowDate[DAY] &&
+            date[HOURS] > nowDate[HOURS] && date[MINUTES] > nowDate[MINUTES]
+
+    private fun getDateAsListOfString(date: GregorianCalendar) : List<String> = listOf(
+            (date.get(Calendar.MONTH) + 1).toString(),
+            date.get(Calendar.DAY_OF_MONTH).toString(),
+            date.get(Calendar.HOUR_OF_DAY).toString(),
+            date.get(Calendar.MINUTE).toString()
+    )
 }
