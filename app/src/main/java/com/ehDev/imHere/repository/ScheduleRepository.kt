@@ -1,9 +1,7 @@
 package com.ehDev.imHere.repository
 
-import com.ehDev.imHere.data.VisitState
 import com.ehDev.imHere.db.dao.ScheduleDao
 import com.ehDev.imHere.db.entity.ScheduleEntity
-import java.util.*
 
 class ScheduleRepository(
         private val scheduleDao: ScheduleDao

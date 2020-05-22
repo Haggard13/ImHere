@@ -22,6 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
+import com.ehDev.imHere.data.VisitState
+import com.ehDev.imHere.repository.InstitutionRepository
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +44,6 @@ class StudentActivity : AppCompatActivity() {
 
     var locationManager: LocationManager? = null
     var locationStudent: Location? = null
-    var locationRTF: Location? = null
     var requestLocationUpdateMade = false
     var wifiMgr: WifiManager? = null
 
@@ -79,11 +80,6 @@ class StudentActivity : AppCompatActivity() {
 
         //region Location Block
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationRTF = Location("locationManager")
-        with(locationRTF!!) {
-            latitude = 56.840750
-            longitude = 60.650750
-        }
 
         studentViewModel.requestLocationPermission(this)
 
@@ -131,34 +127,41 @@ class StudentActivity : AppCompatActivity() {
                 return@launch
             }
 
-            var toastText = when (locationStudent!!.distanceTo(locationRTF) > 100) {
-                true -> "СРОЧНО НА ПАРУ"
-                false -> "ЗНАНИЕ - СИЛА"
-            }
+            lateinit var toastText : String
 
-            //TODO доделать
-            /*when (locationStudent!!.distanceTo(locationRTF) <= 100) {
-                true -> {
-                    val nowDate = getDateAsListOfString(GregorianCalendar())
-                    val fakeDate = getFakeDate(nowDate)
-                    val schedule = studentViewModel.getSchedule()
-                    val nextPairs = schedule.filter {
-                        filterForScheduleOnThisPair(it.date.replace(" ", "").split(","), fakeDate)
-                    }//Оставшиеся пары на день
+            val nowDateGC = GregorianCalendar() // дата как класс
+            val nowDateLS = getDateAsListOfString(GregorianCalendar()) // дата как list строк
+            val fakeDate = getFakeDate(nowDateLS)
+            val schedule = studentViewModel.getSchedule()
+            val nextPairs = schedule.filter {
+                getDateAsGregorianCalendar(it.date) > getDateAsGregorianCalendar(fakeDate)
+            }//Оставшиеся пары на день
 
-                    lateinit var nowPair : ScheduleEntity
-                    if (nextPairs.isEmpty()) {
-                        toastText = "На сегодня пар больше нет"
-                    }
-                    else if () {
-                        toastText = "Пара еще не началась"
-                    } //Проверка, что кнопка нажата во время пары
-                    else {
-                        studentViewModel.changeState(nowPair.date)
-                    }
+            val nowPair = if (nextPairs.isEmpty()) null
+                    else nextPairs.first()
+
+            toastText = if (nowPair == null) {
+                "На сегодня пар больше нет"
+            } else if (getDateAsGregorianCalendar(nowPair.date) > nowDateGC) {
+                "Пара еще не началась"
+            } else if (nowPair.visit == VisitState.VISITED.name){
+                "Вы уже отметились"
+            } else {
+                val nameOfInstitution = getNameOfInstitution(nowPair.auditorium)
+                val institution = studentViewModel.getInstitution(nameOfInstitution)
+                val locationInst = Location("locationManager")
+                with(locationInst!!) {
+                    latitude = institution.latitude
+                    longitude = institution.longitude
                 }
-                false -> toastText = "СРОЧНО НА ПАРУ"
-            }*/
+                when (locationStudent!!.distanceTo(locationInst) <= 100) {
+                    true -> {
+                        studentViewModel.changeState(nowPair.date)
+                        "ЗНАНИЕ - СИЛА"
+                    }
+                    false -> "СРОЧНО НА ПАРУ"
+                }
+            }
 
             showToast(toastText)
 
@@ -217,7 +220,7 @@ class StudentActivity : AppCompatActivity() {
             val todayDate = GregorianCalendar()
             val todayDateList = getDateAsListOfString(todayDate)
             val scheduleOnThisDay = schedule.filter {
-                filterForScheduleOnThisDay(it.date.replace(" ", "").split(","), todayDateList)//Отбирает пары только на этот день
+                filterForScheduleOnThisDay(getSplitForStringDate(it.date), todayDateList)//Отбирает пары только на этот день
             }
 
             schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)
@@ -244,32 +247,26 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun String.isValidUrl() = URLUtil.isValidUrl(this)
-        .not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
+        //.not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
-    private fun getFakeDate(date: List<String>): List<String> = when (Integer.parseInt(date[MINUTES]) < 30) {
+    private fun getFakeDate(date: List<String>): String = when (Integer.parseInt(date[MINUTES]) < 30) {
 
-        true -> listOf(
-            date[MONTH],
-            date[DAY],
-            (Integer.parseInt(date[HOURS]) - 2).toString(),
+        true ->
+            date[MONTH] + ", " +
+            date[DAY] + ", " +
+            (Integer.parseInt(date[HOURS]) - 2).toString() + ", " +
             (Integer.parseInt(date[MINUTES]) + 30).toString()
-        )
-        else -> listOf(
-            date[MONTH],
-            date[DAY],
-            (Integer.parseInt(date[HOURS]) - 1).toString(),
-            (Integer.parseInt(date[MINUTES]) - 30).toString()
-        )
+        else ->
+                date[MONTH] + ", " +
+                date[DAY] + ", " +
+                (Integer.parseInt(date[HOURS]) + 1).toString() + ", " +
+                (Integer.parseInt(date[MINUTES]) - 30).toString()
     }
 
     private fun filterForScheduleOnThisDay(date: List<String>, todayDate: List<String>): Boolean =
         date[MONTH] == todayDate[MONTH] && date[DAY] == todayDate[DAY]
-
-    private fun filterForScheduleOnThisPair(date: List<String>, nowDate: List<String>): Boolean =
-            date[MONTH] == nowDate[MONTH] && date[DAY] == nowDate[DAY] &&
-            date[HOURS] > nowDate[HOURS] && date[MINUTES] > nowDate[MINUTES]
 
     private fun getDateAsListOfString(date: GregorianCalendar) : List<String> = listOf(
             (date.get(Calendar.MONTH) + 1).toString(),
@@ -277,4 +274,20 @@ class StudentActivity : AppCompatActivity() {
             date.get(Calendar.HOUR_OF_DAY).toString(),
             date.get(Calendar.MINUTE).toString()
     )
+
+    private fun getSplitForStringDate(date: String) : List<String> = date.replace(" ", "").split(",")
+
+    private fun getDateAsGregorianCalendar(date: String) : GregorianCalendar {
+        val listDate = getSplitForStringDate(date)
+        val year = GregorianCalendar().get(Calendar.YEAR)
+        return GregorianCalendar(
+                year,
+                listDate[MONTH].toInt(),
+                listDate[DAY].toInt(),
+                listDate[HOURS].toInt(),
+                listDate[MINUTES].toInt()
+        )
+    }
+
+    private fun getNameOfInstitution(auditorium: String) = auditorium.split('-')[0]
 }

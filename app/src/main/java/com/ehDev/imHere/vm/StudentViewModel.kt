@@ -7,7 +7,9 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.db.UrfuRoomDatabase
+import com.ehDev.imHere.db.entity.InstitutionEntity
 import com.ehDev.imHere.db.entity.ScheduleEntity
+import com.ehDev.imHere.repository.InstitutionRepository
 import com.ehDev.imHere.repository.InterviewRepository
 import com.ehDev.imHere.repository.ScheduleRepository
 
@@ -15,6 +17,7 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
 
     private val interviewRepository: InterviewRepository
     private val scheduleRepository: ScheduleRepository
+    private val institutionRepository: InstitutionRepository
 
     init {
 
@@ -31,6 +34,13 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         ).scheduleDao()
 
         scheduleRepository = ScheduleRepository(scheduleDao)
+
+        val institutionDao = UrfuRoomDatabase.getDatabase(
+                context = app,
+                scope = viewModelScope
+        ).institutionDao()
+
+        institutionRepository = InstitutionRepository(institutionDao)
     }
 
     suspend fun getAllInterviews() = interviewRepository.getAllInterviews()
@@ -49,4 +59,6 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         app,
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+
+    suspend fun getInstitution(prefix: String) : InstitutionEntity = institutionRepository.getCoordinates(prefix)[0]
 }
