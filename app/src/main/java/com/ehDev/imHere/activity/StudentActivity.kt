@@ -135,6 +135,7 @@ class StudentActivity : AppCompatActivity() {
             val schedule = studentViewModel.getSchedule()
             val nextPairs = schedule.filter {
                 getDateAsGregorianCalendar(it.date) > getDateAsGregorianCalendar(fakeDate)
+                        && filterForScheduleOnThisDay(getSplitForStringDate(it.date), nowDateLS)
             }//Оставшиеся пары на день
 
             val nowPair = if (nextPairs.isEmpty()) null
@@ -225,8 +226,6 @@ class StudentActivity : AppCompatActivity() {
 
             schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)
         }
-        //В карточке пары должна была быть только следующая пара. Т.к. теперь ресайклер,
-        // то я комменчу(вдруг пригодится) getFakeDate и добавляю фильтр для расписания на текущий день
     }
 
     private fun formatLocation(location: Location?) = when (location) {
@@ -282,7 +281,7 @@ class StudentActivity : AppCompatActivity() {
         val year = GregorianCalendar().get(Calendar.YEAR)
         return GregorianCalendar(
                 year,
-                listDate[MONTH].toInt(),
+                listDate[MONTH].toInt() - 1,
                 listDate[DAY].toInt(),
                 listDate[HOURS].toInt(),
                 listDate[MINUTES].toInt()
