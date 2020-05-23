@@ -43,17 +43,26 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     fun onAddInterviewBtnClick(v: View) {
         addInterviewViewModel.viewModelScope.launch {
             val interviewReference = editTextReference.textAsString
+            val interviewTime = editTextTime.textAsString
 
             when {
                 interviewReference.isNullOrEmpty() -> {
                     showToast("Укажите ссылку")
                     return@launch
                 }
-                interviewReference.isReferenceValid().not() -> {
+                interviewReference.isReferenceValid() -> {
                     showToast("Ссылка некорректна")
                     return@launch
                 }
             }
+
+            when {
+                interviewTime.isValidTime().not() -> {
+                    showToast("Неверно введено время")
+                    return@launch
+                }
+            }
+
 
             val interview = InterviewEntity(
                 interviewReference = interviewReference,
@@ -94,14 +103,16 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     }
 
     //Проверка ссылки на форму
-    // TODO: порефачить
     private fun String.isReferenceValid(): Boolean {
-        val regexShort = Regex("""https://forms\.gle/.+""") // fixme
-        val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""") // fixme:
-        // паттерн не всегда корректно срабатывает
-        // пример - https://docs.google.com/forms/d/e/1FAIpQLSf_Z1OkM1lFStBPrQP1lNNv6KnvEyQVNRz61HbeQ-l8unafLw/viewform
+        val regexShort = Regex("""https://forms\.gle/.+""")
+        val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""")
         return ((matches(regexShort) || matches(regexLong)) && URLUtil.isValidUrl(interviewReference))
-            .not() //fixme: убрать,  для тестов сделано так
+            //.not() //fixme: убрать,  для тестов сделано так
+    }
+
+    private fun String.isValidTime(): Boolean {
+        val regex = Regex("""\d\d/\d\d \d\d:\d\d""")
+        return matches(regex)
     }
 
     //Получение фильтра для выбора получателей

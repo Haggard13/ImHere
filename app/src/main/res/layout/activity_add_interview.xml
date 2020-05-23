@@ -50,7 +50,7 @@
         android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
-        android:hint="Введите срок (дд.мм чч:мм)"
+        android:hint="Введите срок (мм/дд чч:мм)"
         android:inputType="datetime"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"

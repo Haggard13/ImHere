@@ -209,8 +209,7 @@ class StudentActivity : AppCompatActivity() {
                 .filter { it.filter == filter || it.filter == "682" }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
-                startActivity(Intent(ACTION_VIEW, Uri.parse(it.interviewReference)))//fixme проверить работу
-                //showToast("тип переход по клику")
+                startActivity(Intent(ACTION_VIEW, Uri.parse(it.interviewReference)))
             }
         }
     }
