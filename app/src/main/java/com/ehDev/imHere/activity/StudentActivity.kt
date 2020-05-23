@@ -25,12 +25,14 @@ import com.ehDev.imHere.R
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.data.VisitState
+import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -38,6 +40,7 @@ private const val MONTH = 0
 private const val DAY = 1
 private const val HOURS = 2
 private const val MINUTES = 3
+private const val YEAR = 4
 
 class StudentActivity : AppCompatActivity() {
 
@@ -201,12 +204,14 @@ class StudentActivity : AppCompatActivity() {
     private fun listViewCreate() {
         studentViewModel.viewModelScope.launch {
 
-//            val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
+//          val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
             val filter = "682" // fixme: это для тестов, потом заменить на строку выше
+            val nowDate = GregorianCalendar()
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
                 .filter { it.filter == filter || it.filter == "682" }
+                .filter { filterForInterviewDate(it) }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
                 startActivity(Intent(ACTION_VIEW, Uri.parse(it.interviewReference)))
@@ -289,4 +294,18 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun getNameOfInstitution(auditorium: String) = auditorium.split('-')[0]
+
+    private fun filterForInterviewDate(interview : InterviewEntity) : Boolean{
+        //Тут по индексации из-за того что есть год идет смещение на одну позицию. Решил не переделывать, потому что переделывание монструозно слишком
+        val dateList = interview.time.split(':', '/', ' ')
+        val dateInterview = GregorianCalendar(
+                2000 + dateList[0].toInt(),
+                dateList[MONTH + 1].toInt(),
+                dateList[DAY + 1].toInt(),
+                dateList[HOURS + 1].toInt(),
+                dateList[MINUTES + 1].toInt()
+        )
+        val dateNow = GregorianCalendar()
+        return dateInterview > dateNow
+    }
 }

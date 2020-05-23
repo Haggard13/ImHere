@@ -58,7 +58,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
             when {
                 interviewTime.isValidTime().not() -> {
-                    showToast("Неверно введено время")
+                    showToast("Неверный формат времени")
                     return@launch
                 }
             }
@@ -97,6 +97,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     }
 
     private fun setStateSpinner(state: Boolean){
+
         spinnerCourses.isEnabled = state
         spinnerInstitutions.isEnabled = state
         spinnerStudentsUnion.isEnabled = state
@@ -104,6 +105,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
     //Проверка ссылки на форму
     private fun String.isReferenceValid(): Boolean {
+
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""")
         return ((matches(regexShort) || matches(regexLong)) && URLUtil.isValidUrl(interviewReference))
@@ -111,7 +113,8 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     }
 
     private fun String.isValidTime(): Boolean {
-        val regex = Regex("""\d\d/\d\d \d\d:\d\d""")
+
+        val regex = Regex("""\d\d/\d\d/\d\d \d\d:\d\d""")
         return matches(regex)
     }
 
