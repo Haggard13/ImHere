@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.interview_item_view.view.*
 class InterviewRecyclerViewAdapter(
 
     private val interviews: List<InterviewEntity>,
-    private val callback: () -> Unit
+    private val callback: (item: InterviewEntity) -> Unit
 
 ) : RecyclerView.Adapter<InterviewRecyclerViewAdapter.InterviewViewHolder>() {
 
@@ -42,7 +42,7 @@ class InterviewRecyclerViewAdapter(
             interviewTimeTV.text = interviewItem.time
             interviewReferenceTV.text = interviewItem.interviewReference
             itemView.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) callback.invoke()
+                if (adapterPosition != RecyclerView.NO_POSITION) callback.invoke(interviewItem)
             }
         }
     }

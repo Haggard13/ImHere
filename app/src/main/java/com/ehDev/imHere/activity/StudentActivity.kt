@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.View
@@ -23,7 +25,6 @@ import com.ehDev.imHere.R
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.data.VisitState
-import com.ehDev.imHere.repository.InstitutionRepository
 import com.ehDev.imHere.vm.StudentViewModel
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
@@ -151,7 +152,7 @@ class StudentActivity : AppCompatActivity() {
                 val nameOfInstitution = getNameOfInstitution(nowPair.auditorium)
                 val institution = studentViewModel.getInstitution(nameOfInstitution)
                 val locationInst = Location("locationManager")
-                with(locationInst!!) {
+                with(locationInst) {
                     latitude = institution.latitude
                     longitude = institution.longitude
                 }
@@ -208,8 +209,8 @@ class StudentActivity : AppCompatActivity() {
                 .filter { it.filter == filter || it.filter == "682" }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
-//              startActivity(Intent(ACTION_VIEW, Uri.parse(referenceList[position]))) // fixme: неправильно реализован
-                showToast("тип переход по клику")
+                startActivity(Intent(ACTION_VIEW, Uri.parse(it.interviewReference)))//fixme проверить работу
+                //showToast("тип переход по клику")
             }
         }
     }
