@@ -204,8 +204,8 @@ class StudentActivity : AppCompatActivity() {
     private fun listViewCreate() {
         studentViewModel.viewModelScope.launch {
 
-//          val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
-            val filter = "682" // fixme: это для тестов, потом заменить на строку выше
+            val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
+            //val filter = "682" // fixme: это для тестов, потом заменить на строку выше
             val nowDate = GregorianCalendar()
 
             val allInterviews = studentViewModel.getAllInterviews()

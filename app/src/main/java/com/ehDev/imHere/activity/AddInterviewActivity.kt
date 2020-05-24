@@ -50,7 +50,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
                     showToast("Укажите ссылку")
                     return@launch
                 }
-                interviewReference.isReferenceValid() -> {
+                interviewReference.isReferenceValid().not() -> {
                     showToast("Ссылка некорректна")
                     return@launch
                 }
