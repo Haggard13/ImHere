@@ -206,11 +206,10 @@ class StudentActivity : AppCompatActivity() {
 
             val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
             //val filter = "682" // fixme: это для тестов, потом заменить на строку выше
-            val nowDate = GregorianCalendar()
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
-                .filter { it.filter == filter || it.filter == "682" }
+                .filter { filterForInterviewStudent(it.filter, filter!!)}
                 .filter { filterForInterviewDate(it) }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
@@ -308,4 +307,9 @@ class StudentActivity : AppCompatActivity() {
         val dateNow = GregorianCalendar()
         return dateInterview > dateNow
     }
+
+    private fun filterForInterviewStudent(interviewFilter: String, studentFilter: String) : Boolean =
+            (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '6') &&
+            (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '8') &&
+            (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '2')
 }
