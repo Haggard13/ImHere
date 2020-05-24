@@ -108,7 +108,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""")
-        return ((matches(regexShort) || matches(regexLong)) && URLUtil.isValidUrl(interviewReference))
+        return ((matches(regexShort) || matches(regexLong))) //&& URLUtil.isValidUrl(interviewReference)) Не пашет как надо
             //.not() //fixme: убрать,  для тестов сделано так
     }
 
