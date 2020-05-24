@@ -32,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -51,6 +50,8 @@ class StudentActivity : AppCompatActivity() {
     var requestLocationUpdateMade = false
     var wifiMgr: WifiManager? = null
 
+    private val currentDate by lazy { GregorianCalendar() }
+
     // TODO: вынести логику
 //    private val locationListener = StudentLocationListener(locationStudent, baseContext, locationManager)
 
@@ -63,10 +64,7 @@ class StudentActivity : AppCompatActivity() {
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
 
         override fun onProviderEnabled(provider: String) {
-            if (ActivityCompat.checkSelfPermission(
-                    baseContext, Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) return
+            if (studentViewModel.checkLocationPermission() != PackageManager.PERMISSION_GRANTED) return
             locationManager!!.getLastKnownLocation(provider)
         }
 
@@ -106,6 +104,7 @@ class StudentActivity : AppCompatActivity() {
         listViewCreate()
     }
 
+    // todo: разнести логику
     fun onCheckBtnClick(v: View) {
         studentViewModel.viewModelScope.launch {
 
@@ -131,40 +130,43 @@ class StudentActivity : AppCompatActivity() {
                 return@launch
             }
 
-            lateinit var toastText : String
-
-            val nowDateGC = GregorianCalendar() // дата как класс
-            val nowDateLS = getDateAsListOfString(GregorianCalendar()) // дата как list строк
-            val fakeDate = getFakeDate(nowDateLS)
+            val currentDateStringList = currentDate.asStringList()
+            val fakeDate = getFakeDate(currentDate.asStringList())
             val schedule = studentViewModel.getSchedule()
             val nextPairs = schedule.filter {
-                getDateAsGregorianCalendar(it.date) > getDateAsGregorianCalendar(fakeDate)
-                        && filterForScheduleOnThisDay(getSplitForStringDate(it.date), nowDateLS)
+                it.date.toGregorianCalendar() > fakeDate.toGregorianCalendar()
+                        && isItCurrentDay(getSplitForStringDate(it.date), currentDateStringList)
             }//Оставшиеся пары на день
 
-            val nowPair = if (nextPairs.isEmpty()) null
-                    else nextPairs.first()
+            val currentPair = when (nextPairs.isEmpty()) {
 
-            toastText = if (nowPair == null) {
-                "На сегодня пар больше нет"
-            } else if (getDateAsGregorianCalendar(nowPair.date) > nowDateGC) {
-                "Пара еще не началась"
-            } else if (nowPair.visit == VisitState.VISITED.name){
-                "Вы уже отметились"
-            } else {
-                val nameOfInstitution = getNameOfInstitution(nowPair.auditorium)
-                val institution = studentViewModel.getInstitution(nameOfInstitution)
-                val locationInst = Location("locationManager")
-                with(locationInst) {
-                    latitude = institution.latitude
-                    longitude = institution.longitude
-                }
-                when (locationStudent!!.distanceTo(locationInst) <= 100) {
-                    true -> {
-                        studentViewModel.changeState(nowPair.date)
-                        "ЗНАНИЕ - СИЛА"
+                true -> null
+                false -> nextPairs.first()
+            }
+
+            val toastText = when {
+
+                currentPair == null -> "На сегодня пар больше нет"
+
+                currentPair.visit == VisitState.VISITED.name -> "Вы уже отметились"
+
+                currentPair.date.toGregorianCalendar() > currentDate -> "Пара еще не началась"
+
+                else -> {
+                    val institutionName = parseInstitutionName(currentPair.auditorium)
+                    val institution = studentViewModel.getInstitution(institutionName)
+                    val locationInst = Location("locationManager")
+                    with(locationInst) {
+                        latitude = institution.latitude
+                        longitude = institution.longitude
                     }
-                    false -> "СРОЧНО НА ПАРУ"
+                    when (locationStudent!!.distanceTo(locationInst) <= 100) {
+                        true -> {
+                            studentViewModel.changeState(currentPair.date)
+                            "ЗНАНИЕ - СИЛА"
+                        }
+                        false -> "СРОЧНО НА ПАРУ"
+                    }
                 }
             }
 
@@ -210,7 +212,7 @@ class StudentActivity : AppCompatActivity() {
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
-                .filter { filterForInterviewStudent(it.filter, filter)}
+                .filter { filterForInterviewStudent(it.filter, filter) }
                 .filter { filterForInterviewDate(it) }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
@@ -223,10 +225,10 @@ class StudentActivity : AppCompatActivity() {
         studentViewModel.viewModelScope.launch {
 
             val schedule = studentViewModel.getSchedule()
-            val todayDate = GregorianCalendar()
-            val todayDateList = getDateAsListOfString(todayDate)
             val scheduleOnThisDay = schedule.filter {
-                filterForScheduleOnThisDay(getSplitForStringDate(it.date), todayDateList)//Отбирает пары только на этот день
+                isItCurrentDay(
+                    getSplitForStringDate(it.date), currentDate.asStringList()
+                )//Отбирает пары только на этот день
             }
 
             schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)
@@ -248,61 +250,62 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun String.isValidUrl() = URLUtil.isValidUrl(this)
-        //.not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
+    //.not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
-    private fun getFakeDate(date: List<String>): String = when (Integer.parseInt(date[MINUTES]) < 30) {
+    private fun getFakeDate(date: List<String>): String = when ((date[MINUTES]).asInt() < 30) {
 
         true -> "${date[MONTH]}, ${date[DAY]}, ${date[HOURS].asInt() - 2}, ${date[MINUTES].asInt() + 30}"
         else -> "${date[MONTH]}, ${date[DAY]}, ${date[HOURS].asInt() + 1}, ${date[MINUTES].asInt() - 30}"
     }
 
-    private fun filterForScheduleOnThisDay(date: List<String>, todayDate: List<String>): Boolean =
+    private fun isItCurrentDay(date: List<String>, todayDate: List<String>): Boolean =
         date[MONTH] == todayDate[MONTH] && date[DAY] == todayDate[DAY]
 
-    private fun getDateAsListOfString(date: GregorianCalendar) : List<String> = listOf(
-            (date.get(Calendar.MONTH) + 1).toString(),
-            date.get(Calendar.DAY_OF_MONTH).toString(),
-            date.get(Calendar.HOUR_OF_DAY).toString(),
-            date.get(Calendar.MINUTE).toString()
+    private fun GregorianCalendar.asStringList(): List<String> = listOf(
+        (get(Calendar.MONTH) + 1).toString(),
+        get(Calendar.DAY_OF_MONTH).toString(),
+        get(Calendar.HOUR_OF_DAY).toString(),
+        get(Calendar.MINUTE).toString()
     )
 
-    private fun getSplitForStringDate(date: String) : List<String> = date.replace(" ", "").split(",")
+    private fun getSplitForStringDate(date: String): List<String> = date.replace(" ", "").split(",")
 
-    private fun getDateAsGregorianCalendar(date: String) : GregorianCalendar {
-        val listDate = getSplitForStringDate(date)
-        val year = GregorianCalendar().get(Calendar.YEAR)
+    private fun String.toGregorianCalendar(): GregorianCalendar {
+
+        val listDate = getSplitForStringDate(this)
+        val year = currentDate.get(Calendar.YEAR)
+
         return GregorianCalendar(
-                year,
-                listDate[MONTH].toInt() - 1,
-                listDate[DAY].toInt(),
-                listDate[HOURS].toInt(),
-                listDate[MINUTES].toInt()
+            year,
+            listDate[MONTH].toInt() - 1,
+            listDate[DAY].toInt(),
+            listDate[HOURS].toInt(),
+            listDate[MINUTES].toInt()
         )
     }
 
-    private fun getNameOfInstitution(auditorium: String) = auditorium.split('-')[0]
+    private fun parseInstitutionName(auditorium: String) = auditorium.split('-')[0]
 
-    private fun filterForInterviewDate(interview : InterviewEntity) : Boolean{
+    private fun filterForInterviewDate(interview: InterviewEntity): Boolean {
         // Тут по индексации из-за того что есть год идет смещение на одну позицию.
         // Решил не переделывать, потому что переделывание монструозно слишком
         val dateList = interview.time.split(':', '/', ' ')
         val dateInterview = GregorianCalendar(
-                2000 + dateList[0].toInt(),
-                dateList[MONTH + 1].toInt(),
-                dateList[DAY + 1].toInt(),
-                dateList[HOURS + 1].toInt(),
-                dateList[MINUTES + 1].toInt()
+            2000 + dateList[0].toInt(),
+            dateList[MONTH + 1].toInt(),
+            dateList[DAY + 1].toInt(),
+            dateList[HOURS + 1].toInt(),
+            dateList[MINUTES + 1].toInt()
         )
-        val dateNow = GregorianCalendar()
-        return dateInterview > dateNow
+        return dateInterview > currentDate
     }
 
-    private fun filterForInterviewStudent(interviewFilter: String, studentFilter: String) : Boolean =
-            (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '6') &&
-            (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '8') &&
-            (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '2')
+    private fun filterForInterviewStudent(interviewFilter: String, studentFilter: String): Boolean =
+        (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '6') &&
+                (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '8') &&
+                (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '2')
 
     private fun String.asInt() = Integer.parseInt(this)
 }
