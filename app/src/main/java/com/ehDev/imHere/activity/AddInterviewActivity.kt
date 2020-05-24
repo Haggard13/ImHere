@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.webkit.URLUtil
-import android.widget.*
+import android.widget.CompoundButton
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
@@ -17,7 +17,6 @@ import com.ehDev.imHere.extensions.textAsString
 import com.ehDev.imHere.vm.AddInterviewViewModel
 import kotlinx.android.synthetic.main.activity_add_interview.*
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 
 class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {
 

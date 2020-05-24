@@ -204,12 +204,13 @@ class StudentActivity : AppCompatActivity() {
     private fun listViewCreate() {
         studentViewModel.viewModelScope.launch {
 
-            val filter = getSharedPreferences("authentication", MODE_PRIVATE).getString("filter", "682") // fixme
+            val filter = getSharedPreferences("authentication", MODE_PRIVATE)
+                .getString("filter", "682") ?: "682" // fixme
             //val filter = "682" // fixme: это для тестов, потом заменить на строку выше
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
-                .filter { filterForInterviewStudent(it.filter, filter!!)}
+                .filter { filterForInterviewStudent(it.filter, filter)}
                 .filter { filterForInterviewDate(it) }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
@@ -233,11 +234,8 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun formatLocation(location: Location?) = when (location) {
-
         null -> ""
-        else -> String.format(
-            "lat = %1$.6f, lon = %2$.6f", location.latitude, location.longitude
-        ) // todo: обдумать как переписать
+        else -> "lat = %1$.6f, lon = %2$.6f".format(location.latitude, location.longitude)
     }
 
     @SuppressLint("MissingPermission")
@@ -256,16 +254,8 @@ class StudentActivity : AppCompatActivity() {
 
     private fun getFakeDate(date: List<String>): String = when (Integer.parseInt(date[MINUTES]) < 30) {
 
-        true ->
-            date[MONTH] + ", " +
-            date[DAY] + ", " +
-            (Integer.parseInt(date[HOURS]) - 2).toString() + ", " +
-            (Integer.parseInt(date[MINUTES]) + 30).toString()
-        else ->
-                date[MONTH] + ", " +
-                date[DAY] + ", " +
-                (Integer.parseInt(date[HOURS]) + 1).toString() + ", " +
-                (Integer.parseInt(date[MINUTES]) - 30).toString()
+        true -> "${date[MONTH]}, ${date[DAY]}, ${date[HOURS].asInt() - 2}, ${date[MINUTES].asInt() + 30}"
+        else -> "${date[MONTH]}, ${date[DAY]}, ${date[HOURS].asInt() + 1}, ${date[MINUTES].asInt() - 30}"
     }
 
     private fun filterForScheduleOnThisDay(date: List<String>, todayDate: List<String>): Boolean =
@@ -295,7 +285,8 @@ class StudentActivity : AppCompatActivity() {
     private fun getNameOfInstitution(auditorium: String) = auditorium.split('-')[0]
 
     private fun filterForInterviewDate(interview : InterviewEntity) : Boolean{
-        //Тут по индексации из-за того что есть год идет смещение на одну позицию. Решил не переделывать, потому что переделывание монструозно слишком
+        // Тут по индексации из-за того что есть год идет смещение на одну позицию.
+        // Решил не переделывать, потому что переделывание монструозно слишком
         val dateList = interview.time.split(':', '/', ' ')
         val dateInterview = GregorianCalendar(
                 2000 + dateList[0].toInt(),
@@ -312,4 +303,6 @@ class StudentActivity : AppCompatActivity() {
             (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '6') &&
             (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '8') &&
             (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '2')
+
+    private fun String.asInt() = Integer.parseInt(this)
 }
