@@ -136,6 +136,7 @@ class StudentActivity : AppCompatActivity() {
             val nextPairs = schedule.filter {
                 it.date.toGregorianCalendar() > fakeDate.toGregorianCalendar()
                         && isItCurrentDay(getSplitForStringDate(it.date), currentDateStringList)
+                        && it.type != "Онлайн-курс"
             }//Оставшиеся пары на день
 
             val currentPair = when (nextPairs.isEmpty()) {
