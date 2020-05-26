@@ -39,7 +39,6 @@ private const val MONTH = 0
 private const val DAY = 1
 private const val HOURS = 2
 private const val MINUTES = 3
-private const val YEAR = 4
 
 class StudentActivity : AppCompatActivity() {
 
@@ -131,7 +130,7 @@ class StudentActivity : AppCompatActivity() {
             }
 
             val currentDateStringList = currentDate.asStringList()
-            val fakeDate = getFakeDate(currentDate.asStringList())
+            val fakeDate = getFakeDate(currentDateStringList)
             val schedule = studentViewModel.getSchedule()
             val nextPairs = schedule.filter {
                 it.date.toGregorianCalendar() > fakeDate.toGregorianCalendar()
