@@ -33,16 +33,16 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
 
         spinnerCourses.setSelection(6)
-        spinnerInstitutions.setSelection(8)
-        spinnerStudentsUnion.setSelection(2)
+        institutions_spinner.setSelection(8)
+        students_union_spinner.setSelection(2)
         setStateSpinner(false)
 
-        switchAllStudents.setOnCheckedChangeListener(this)
+        all_students_switch.setOnCheckedChangeListener(this)
     }
 
     fun onAddInterviewBtnClick(v: View) {
         addInterviewViewModel.viewModelScope.launch {
-            val interviewReference = editTextReference.textAsString
+            val interviewReference = interview_reference_et.textAsString
             val interviewTime = interview_date_et.textAsString
 
             when {
@@ -99,8 +99,8 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     private fun setStateSpinner(state: Boolean){
 
         spinnerCourses.isEnabled = state
-        spinnerInstitutions.isEnabled = state
-        spinnerStudentsUnion.isEnabled = state
+        institutions_spinner.isEnabled = state
+        students_union_spinner.isEnabled = state
     }
 
     //Проверка ссылки на форму
@@ -119,12 +119,12 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     }
 
     //Получение фильтра для выбора получателей
-    private fun getStudentFilter() = when (switchAllStudents.isChecked) {
+    private fun getStudentFilter() = when (all_students_switch.isChecked) {
 
         true -> "682"
         else -> "${spinnerCourses.selectedItemPosition}" +
-                "${spinnerInstitutions.selectedItemPosition}" +
-                "${spinnerStudentsUnion.selectedItemPosition}"
+                "${institutions_spinner.selectedItemPosition}" +
+                "${students_union_spinner.selectedItemPosition}"
     }
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()

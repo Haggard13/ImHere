@@ -114,7 +114,7 @@
             android:text="Союз студентов" />
 
         <Spinner
-            android:id="@+id/spinnerStudentsUnion"
+            android:id="@+id/students_union_spinner"
             android:layout_width="330dp"
             android:layout_height="25dp"
             android:background="#DFDFDF"
@@ -142,7 +142,7 @@
             android:text="Институт" />
 
         <Spinner
-            android:id="@+id/spinnerInstitutions"
+            android:id="@+id/institutions_spinner"
             android:layout_width="330dp"
             android:layout_height="25dp"
             android:background="#DFDFDF"
@@ -166,7 +166,7 @@
         app:layout_constraintVertical_bias="0.953" />
 
     <EditText
-        android:id="@+id/editTextReference"
+        android:id="@+id/interview_reference_et"
         android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
@@ -183,7 +183,7 @@
         app:layout_constraintVertical_bias="0.699" />
 
     <Switch
-        android:id="@+id/switchAllStudents"
+        android:id="@+id/all_students_switch"
         android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#dfdfdf"
