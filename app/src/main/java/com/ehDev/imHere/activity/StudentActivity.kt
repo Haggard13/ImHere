@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
 import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.activity.PreviewActivity.Companion.FILTER_SHARED_PREFS
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.data.VisitState
@@ -208,7 +209,7 @@ class StudentActivity : AppCompatActivity() {
         studentViewModel.viewModelScope.launch {
 
             val filter = getSharedPreferences("authentication", MODE_PRIVATE)
-                .getString("filter", "682") ?: "682" // fixme
+                .getString(FILTER_SHARED_PREFS, "682") ?: "682" // fixme
             //val filter = "682" // fixme: это для тестов, потом заменить на строку выше
 
             val allInterviews = studentViewModel.getAllInterviews()
@@ -229,7 +230,7 @@ class StudentActivity : AppCompatActivity() {
             val scheduleOnThisDay = schedule.filter {
                 isItCurrentDay(
                     getSplitForStringDate(it.date), currentDate.asStringList()
-                )//Отбирает пары только на этот день
+                )
             }
 
             schedule_rv.adapter = ScheduleRecyclerViewAdapter(scheduleOnThisDay)

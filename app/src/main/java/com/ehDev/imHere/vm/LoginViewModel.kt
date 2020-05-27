@@ -5,6 +5,8 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.activity.PreviewActivity.Companion.FILTER_SHARED_PREFS
+import com.ehDev.imHere.activity.PreviewActivity.Companion.PERSON_TYPE_SHARED_PREFS
 import com.ehDev.imHere.db.UrfuRoomDatabase
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.repository.AccountRepository
@@ -51,8 +53,8 @@ class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
 
         with(sp.edit()) {
             putBoolean(AUTHENTICATION_SHARED_PREFS, true)
-            putString("personType", account.personType)
-            putString("filter", account.filter)
+            putString(PERSON_TYPE_SHARED_PREFS, account.personType)
+            putString(FILTER_SHARED_PREFS, account.filter)
             apply()
         }
     }

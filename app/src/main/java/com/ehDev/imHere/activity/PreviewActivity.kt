@@ -17,6 +17,8 @@ class PreviewActivity : AppCompatActivity() {
     companion object {
 
         const val AUTHENTICATION_SHARED_PREFS = "authentication"
+        const val PERSON_TYPE_SHARED_PREFS = "personType"
+        const val FILTER_SHARED_PREFS = "filter"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +43,7 @@ class PreviewActivity : AppCompatActivity() {
 
                     false -> startActivityIntent(LoginActivity::class.java)
 
-                    true -> when (sp.getString("personType", PersonType.STUDENT.name) == PersonType.STUDENT.name) {
+                    true -> when (sp.getString(PERSON_TYPE_SHARED_PREFS, PersonType.STUDENT.name) == PersonType.STUDENT.name) {
                         true -> startActivityIntent(StudentActivity::class.java)
                         else -> startActivityIntent(AddInterviewActivity::class.java)
                     }
