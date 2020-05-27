@@ -13,15 +13,16 @@
     <string name="add">Добавить</string>
     <string name="by_eh13">by eh13</string>
     <string-array name="courses">
+        <item>Все курсы</item>
         <item>Первый</item>
         <item>Второй</item>
         <item>Третий</item>
         <item>Четвертый</item>
         <item>Пятый</item>
         <item>Шестой</item>
-        <item>Все курсы</item>
     </string-array>
     <string-array name="institutions">
+        <item>Все институты</item>
         <item>ИРИТ-РТФ</item>
         <item>ИСА</item>
         <item>УГИ</item>
@@ -30,12 +31,11 @@
         <item>ИНМиТ</item>
         <item>ИнФО</item>
         <item>ХТИ</item>
-        <item>Все институты</item>
     </string-array>
     <string-array name="students_union">
+        <item>Все студенты</item>
         <item>Да</item>
         <item>Нет</item>
-        <item>Все студенты</item>
     </string-array>
     <string name="title_activity_main">MainActivity</string>
     <string name="tab_text_1">Tab 1</string>

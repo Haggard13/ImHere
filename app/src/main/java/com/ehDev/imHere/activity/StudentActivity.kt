@@ -209,8 +209,8 @@ class StudentActivity : AppCompatActivity() {
         studentViewModel.viewModelScope.launch {
 
             val filter = getSharedPreferences("authentication", MODE_PRIVATE)
-                .getString(FILTER_SHARED_PREFS, "682") ?: "682" // fixme
-            //val filter = "682" // fixme: это для тестов, потом заменить на строку выше
+                .getString(FILTER_SHARED_PREFS, "000") ?: "000" // fixme
+            //val filter = "000" // fixme: это для тестов, потом заменить на строку выше
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
@@ -305,9 +305,9 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun filterForInterviewStudent(interviewFilter: String, studentFilter: String): Boolean =
-        (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '6') &&
-                (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '8') &&
-                (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '2')
+        (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '0') &&
+                (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '0') &&
+                (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '0')
 
     private fun String.asInt() = Integer.parseInt(this)
 }

@@ -32,9 +32,9 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
         addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
 
-        spinnerCourses.setSelection(6)
-        institutions_spinner.setSelection(8)
-        students_union_spinner.setSelection(2)
+        courses_spinner.setSelection(0)
+        institutions_spinner.setSelection(0)
+        students_union_spinner.setSelection(0)
         setStateSpinner(false)
 
         all_students_switch.setOnCheckedChangeListener(this)
@@ -98,7 +98,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
     private fun setStateSpinner(state: Boolean){
 
-        spinnerCourses.isEnabled = state
+        courses_spinner.isEnabled = state
         institutions_spinner.isEnabled = state
         students_union_spinner.isEnabled = state
     }
@@ -121,8 +121,8 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     //Получение фильтра для выбора получателей
     private fun getStudentFilter() = when (all_students_switch.isChecked) {
 
-        true -> "682"
-        else -> "${spinnerCourses.selectedItemPosition}" +
+        true -> "000"
+        else -> "${courses_spinner.selectedItemPosition}" +
                 "${institutions_spinner.selectedItemPosition}" +
                 "${students_union_spinner.selectedItemPosition}"
     }

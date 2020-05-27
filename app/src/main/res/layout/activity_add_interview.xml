@@ -84,7 +84,7 @@
             android:text="Курсы" />
 
         <Spinner
-            android:id="@+id/spinnerCourses"
+            android:id="@+id/courses_spinner"
             android:layout_width="330dp"
             android:layout_height="25dp"
             android:background="#DFDFDF"
