@@ -10,7 +10,7 @@
     <!-- TODO: добавить маску ввода -->
 
     <EditText
-        android:id="@+id/editTextName"
+        android:id="@+id/interview_title_et"
         android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
@@ -24,11 +24,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTime"
+        app:layout_constraintTop_toBottomOf="@+id/interview_date_et"
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/editTextAuthor"
+        android:id="@+id/interview_author_et"
         android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
@@ -38,7 +38,7 @@
         android:paddingRight="5dp"
         android:textColor="#101010"
         android:textColorHint="#A3A3A3"
-        app:layout_constraintBottom_toTopOf="@+id/editTextTime"
+        app:layout_constraintBottom_toTopOf="@+id/interview_date_et"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +46,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <EditText
-        android:id="@+id/editTextTime"
+        android:id="@+id/interview_date_et"
         android:layout_width="330dp"
         android:layout_height="35dp"
         android:background="#DFDFDF"
@@ -73,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editTextName"
+        app:layout_constraintTop_toTopOf="@+id/interview_title_et"
         app:layout_constraintVertical_bias="0.221">
 
         <TextView
@@ -194,7 +194,7 @@
         android:shadowColor="#FFFFFF"
         android:text="@string/interview_all"
         android:textColor="#171717"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextAuthor"
+        app:layout_constraintBottom_toBottomOf="@+id/interview_author_et"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"

@@ -31,14 +31,14 @@ class InterviewRecyclerViewAdapter(
     inner class InterviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val interviewerTV = itemView.interviewer_tv
-        private val intervieweeTV = itemView.interviewee_tv
+        private val interviewTitleTV = itemView.interview_title_tv
         private val interviewTimeTV = itemView.interview_time_tv
         private val interviewReferenceTV = itemView.interview_reference_tv
 
         fun bind(interviewItem: InterviewEntity) {
 
             interviewerTV.text = interviewItem.interviewer
-            intervieweeTV.text = interviewItem.interviewee
+            interviewTitleTV.text = interviewItem.title
             interviewTimeTV.text = interviewItem.time
             interviewReferenceTV.text = interviewItem.interviewReference
             itemView.setOnClickListener {

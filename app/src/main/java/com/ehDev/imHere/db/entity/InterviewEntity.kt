@@ -11,8 +11,8 @@ data class InterviewEntity(
     @ColumnInfo(name = "interview_reference")
     val interviewReference: String,
 
-    val interviewer: String, // fixme?
-    val interviewee: String, // fixme?
+    val interviewer: String,
+    val title: String,
     val filter: String,
     val time: String
 )

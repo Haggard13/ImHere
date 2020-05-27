@@ -42,7 +42,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     fun onAddInterviewBtnClick(v: View) {
         addInterviewViewModel.viewModelScope.launch {
             val interviewReference = editTextReference.textAsString
-            val interviewTime = editTextTime.textAsString
+            val interviewTime = interview_date_et.textAsString
 
             when {
                 interviewReference.isNullOrEmpty() -> {
@@ -65,10 +65,10 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
             val interview = InterviewEntity(
                 interviewReference = interviewReference,
-                interviewer = editTextAuthor.textAsString,
-                interviewee = editTextName.textAsString,
+                interviewer = interview_author_et.textAsString,
+                title = interview_title_et.textAsString,
                 filter = getStudentFilter(),
-                time = editTextTime.textAsString
+                time = interview_date_et.textAsString
             )
 
             try {
