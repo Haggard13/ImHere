@@ -12,6 +12,7 @@ import com.ehDev.imHere.data.PersonType
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.vm.LoginViewModel
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -23,6 +24,10 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+
+        loginViewModel.viewModelScope.launch(Dispatchers.IO) {
+            loginViewModel.fillDatabaseWithFakeInfo()
+        }
     }
 
     /**

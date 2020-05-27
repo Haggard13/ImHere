@@ -12,14 +12,34 @@ class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
 
     private val repository: AccountRepository
 
-    init {
+    private val db: UrfuRoomDatabase by lazy {
 
-        val accountDao = UrfuRoomDatabase.getDatabase(
+        UrfuRoomDatabase.getDatabase(
             context = app,
             scope = viewModelScope
-        ).accountDao()
+        )
+    }
+
+    init {
+
+        val accountDao = db.accountDao()
 
         repository = AccountRepository(accountDao)
+    }
+
+    /**
+     * В Room колбек onCreate дергается только после обращения к бд
+     * с действием на чтение/запись. Поэтому, имитируем обращение, чтобы
+     * дать заполниться фейковы данным. Если этого не сделать, то к моменту самого первого
+     * обращения к бд (например - с помощью [getAccountByLogin]) мы получим null, так как
+     * бд будет пустой, и только после этого самого обращения бд заполнится значениями.
+     *
+     * https://stackoverflow.com/questions/48280941/room-database-force-oncreate-callback
+     */
+    fun fillDatabaseWithFakeInfo() {
+        db.runInTransaction {
+            // имитируем работу с бд, так как она заполняется фейковыми данными только после обращения к ней
+        }
     }
 
     suspend fun getAccountByLogin(login: String) = repository.getAccountByLogin(login)
