@@ -59,6 +59,10 @@ dependencies {
     // jsoup
     implementation 'org.jsoup:jsoup:1.8.3'
 
+
+    // GSON
+    implementation 'com.google.code.gson:gson:2.8.5'
+
     // Testing
     testImplementation 'junit:junit:4.12'
 
