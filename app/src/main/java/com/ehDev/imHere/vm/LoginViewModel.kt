@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
 import com.ehDev.imHere.db.UrfuRoomDatabase
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.repository.AccountRepository
@@ -46,10 +47,10 @@ class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun saveAccountToSharedPrefs(account: AccountEntity) {
 
-        val sp = app.getSharedPreferences("authentication", Context.MODE_PRIVATE)
+        val sp = app.getSharedPreferences(AUTHENTICATION_SHARED_PREFS, Context.MODE_PRIVATE)
 
         with(sp.edit()) {
-            putBoolean("authentication", true)
+            putBoolean(AUTHENTICATION_SHARED_PREFS, true)
             putString("personType", account.personType)
             putString("filter", account.filter)
             apply()

@@ -14,6 +14,11 @@ import kotlinx.coroutines.withContext
 
 class PreviewActivity : AppCompatActivity() {
 
+    companion object {
+
+        const val AUTHENTICATION_SHARED_PREFS = "authentication"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preview)
@@ -30,9 +35,9 @@ class PreviewActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
 
-                val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
+                val sp = getSharedPreferences(AUTHENTICATION_SHARED_PREFS, Context.MODE_PRIVATE)
 
-                when (sp.contains("authentication") && sp.getBoolean("authentication", false)) {
+                when (sp.contains(AUTHENTICATION_SHARED_PREFS) && sp.getBoolean(AUTHENTICATION_SHARED_PREFS, false)) {
 
                     false -> startActivityIntent(LoginActivity::class.java)
 

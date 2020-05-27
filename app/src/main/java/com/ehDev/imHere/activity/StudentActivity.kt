@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
+import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.data.VisitState
@@ -181,7 +182,7 @@ class StudentActivity : AppCompatActivity() {
 
     fun onExitBtnClick(v: View) {
 
-        val sp = getSharedPreferences("authentication", Context.MODE_PRIVATE)
+        val sp = getSharedPreferences(AUTHENTICATION_SHARED_PREFS, Context.MODE_PRIVATE)
         sp.edit().clear().apply()
         startActivity(Intent(this, LoginActivity::class.java))
         super@StudentActivity.finish()
