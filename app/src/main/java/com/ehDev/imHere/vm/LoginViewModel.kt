@@ -4,12 +4,11 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
-import com.ehDev.imHere.activity.PreviewActivity.Companion.FILTER_SHARED_PREFS
-import com.ehDev.imHere.activity.PreviewActivity.Companion.PERSON_TYPE_SHARED_PREFS
 import com.ehDev.imHere.db.UrfuRoomDatabase
 import com.ehDev.imHere.db.entity.AccountEntity
 import com.ehDev.imHere.repository.AccountRepository
+import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.utils.PERSON_TYPE_SHARED_PREFS
 
 class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
 
@@ -33,7 +32,7 @@ class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
     /**
      * В Room колбек onCreate дергается только после обращения к бд
      * с действием на чтение/запись. Поэтому, имитируем обращение, чтобы
-     * дать заполниться фейковы данным. Если этого не сделать, то к моменту самого первого
+     * дать заполниться фейковым данным. Если этого не сделать, то к моменту самого первого
      * обращения к бд (например - с помощью [getAccountByLogin]) мы получим null, так как
      * бд будет пустой, и только после этого самого обращения бд заполнится значениями.
      *
@@ -54,7 +53,6 @@ class LoginViewModel(private val app: Application) : AndroidViewModel(app) {
         with(sp.edit()) {
             putBoolean(AUTHENTICATION_SHARED_PREFS, true)
             putString(PERSON_TYPE_SHARED_PREFS, account.personType)
-            putString(FILTER_SHARED_PREFS, account.filter)
             apply()
         }
     }

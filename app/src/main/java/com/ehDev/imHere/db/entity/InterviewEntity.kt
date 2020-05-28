@@ -13,6 +13,8 @@ data class InterviewEntity(
 
     val interviewer: String,
     val title: String,
-    val filter: String,
+    val course: String,
+    val institution: String,
+    val studentUnionInfo: String,
     val time: String
 )

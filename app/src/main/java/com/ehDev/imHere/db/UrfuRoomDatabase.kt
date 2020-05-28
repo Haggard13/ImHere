@@ -86,8 +86,7 @@ abstract class UrfuRoomDatabase : RoomDatabase() {
 
                     login = FakeDataHolder.login[index],
                     password = FakeDataHolder.password[index],
-                    personType = FakeDataHolder.login[index].calculatePersonType(),
-                    filter = FakeDataHolder.filter[index]
+                    personType = FakeDataHolder.login[index].calculatePersonType()
                 )
 
                 database.accountDao().insert(fakeAccount)

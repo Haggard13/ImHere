@@ -12,9 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
-import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.data.filter.CourseType
+import com.ehDev.imHere.data.filter.InstitutionType
+import com.ehDev.imHere.data.filter.StudentInfo
+import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.textAsString
+import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
 import com.ehDev.imHere.vm.AddInterviewViewModel
 import kotlinx.android.synthetic.main.activity_add_interview.*
 import kotlinx.coroutines.launch
@@ -22,7 +26,6 @@ import kotlinx.coroutines.launch
 class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {
 
     private lateinit var addInterviewViewModel: AddInterviewViewModel
-    private var interviewReference: String? = null
 
     // TODO: разнести логику
     @SuppressLint("ResourceType")
@@ -63,12 +66,15 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
                 }
             }
 
+            val filterInfo = getStudentFilter()
 
             val interview = InterviewEntity(
                 interviewReference = interviewReference,
                 interviewer = interview_author_et.textAsString,
                 title = interview_title_et.textAsString,
-                filter = getStudentFilter(),
+                course = filterInfo.course.description,
+                institution = filterInfo.institution.description,
+                studentUnionInfo = filterInfo.studentUnionInfo.description,
                 time = interview_date_et.textAsString
             )
 
@@ -109,22 +115,29 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""")
         return ((matches(regexShort) || matches(regexLong))) //&& URLUtil.isValidUrl(interviewReference)) Не пашет как надо
-            //.not() //fixme: убрать,  для тестов сделано так
+            .not() //fixme: убрать,  для тестов сделано так
     }
 
     private fun String.isValidTime(): Boolean {
 
         val regex = Regex("""\d\d/\d\d/\d\d \d\d:\d\d""")
         return matches(regex)
+            .not()
     }
 
     //Получение фильтра для выбора получателей
     private fun getStudentFilter() = when (all_students_switch.isChecked) {
 
-        true -> "000"
-        else -> "${courses_spinner.selectedItemPosition}" +
-                "${institutions_spinner.selectedItemPosition}" +
-                "${students_union_spinner.selectedItemPosition}"
+        true -> StudentInfo(
+            course = CourseType.ALL_COURSES,
+            institution = InstitutionType.ALL_INSTITUTIONS,
+            studentUnionInfo = StudentUnionType.ALL_STUDENTS
+        )
+        else -> StudentInfo(
+            course = CourseType.findCourseByDescription(courses_spinner.selectedItem.toString()),
+            institution = InstitutionType.findInstituteByDescription(institutions_spinner.selectedItem.toString()),
+            studentUnionInfo = StudentUnionType.findStudentUnionInfoByDescription(students_union_spinner.selectedItem.toString())
+        )
     }
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()

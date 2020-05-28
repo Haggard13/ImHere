@@ -13,7 +13,5 @@ data class AccountEntity(
     val password: Int,
 
     @ColumnInfo(name = "person_type")
-    val personType: String,
-
-    val filter: String
+    val personType: String
 )

@@ -22,13 +22,19 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ehDev.imHere.R
-import com.ehDev.imHere.activity.PreviewActivity.Companion.AUTHENTICATION_SHARED_PREFS
-import com.ehDev.imHere.activity.PreviewActivity.Companion.FILTER_SHARED_PREFS
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.data.VisitState
+import com.ehDev.imHere.data.filter.CourseType
+import com.ehDev.imHere.data.filter.InstitutionType
+import com.ehDev.imHere.data.filter.StudentInfo
+import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.entity.InterviewEntity
+import com.ehDev.imHere.extensions.asInt
+import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.utils.STUDENT_INFO_SHARED_PREFS
 import com.ehDev.imHere.vm.StudentViewModel
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -102,7 +108,8 @@ class StudentActivity : AppCompatActivity() {
         wifiMgr = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
         classCardCreate()
         tabHostCreate()
-        listViewCreate()
+
+        listViewCreate(studentInfo = loadSavedStudentInfo())
     }
 
     // todo: разнести логику
@@ -205,17 +212,13 @@ class StudentActivity : AppCompatActivity() {
         tabHost.setCurrentTabByTag("tag1")
     }
 
-    private fun listViewCreate() {
+    private fun listViewCreate(studentInfo: StudentInfo) {
         studentViewModel.viewModelScope.launch {
-
-            val filter = getSharedPreferences("authentication", MODE_PRIVATE)
-                .getString(FILTER_SHARED_PREFS, "000") ?: "000" // fixme
-            //val filter = "000" // fixme: это для тестов, потом заменить на строку выше
 
             val allInterviews = studentViewModel.getAllInterviews()
                 .filter { it.interviewReference.isValidUrl() }
-                .filter { filterForInterviewStudent(it.filter, filter) }
-                .filter { filterForInterviewDate(it) }
+                .filter { filterStudentInfo(it, studentInfo) }
+                .filter { filterInterviewDate(it) }
 
             interview_rv.adapter = InterviewRecyclerViewAdapter(allInterviews) {
                 startActivity(Intent(ACTION_VIEW, Uri.parse(it.interviewReference)))
@@ -290,7 +293,7 @@ class StudentActivity : AppCompatActivity() {
 
     private fun parseInstitutionName(auditorium: String) = auditorium.split('-')[0]
 
-    private fun filterForInterviewDate(interview: InterviewEntity): Boolean {
+    private fun filterInterviewDate(interview: InterviewEntity): Boolean {
         // Тут по индексации из-за того что есть год идет смещение на одну позицию.
         // Решил не переделывать, потому что переделывание монструозно слишком
         val dateList = interview.time.split(':', '/', ' ')
@@ -304,10 +307,40 @@ class StudentActivity : AppCompatActivity() {
         return dateInterview > currentDate
     }
 
-    private fun filterForInterviewStudent(interviewFilter: String, studentFilter: String): Boolean =
-        (interviewFilter[0] == studentFilter[0] || interviewFilter[0] == '0') &&
-                (interviewFilter[1] == studentFilter[1] || interviewFilter[1] == '0') &&
-                (interviewFilter[2] == studentFilter[2] || interviewFilter[2] == '0')
+    private fun filterStudentInfo(interview: InterviewEntity, studentInfo: StudentInfo) =
+        (studentInfo.course.isCourseCorrect(interview.course))
+                && (studentInfo.institution.isInstituteCorrect(interview.institution))
+                && (studentInfo.studentUnionInfo.isStudentUnionInfoCorrect(interview.studentUnionInfo))
 
-    private fun String.asInt() = Integer.parseInt(this)
+    private fun saveStudentInfo(studentInfo: StudentInfo) {
+
+        val sp = getPreferences(Context.MODE_PRIVATE)
+        with(sp.edit()) {
+            val studentInfoJson = Gson().toJson(studentInfo)
+            putString(STUDENT_INFO_SHARED_PREFS, studentInfoJson)
+            apply()
+        }
+    }
+
+    private fun loadSavedStudentInfo(): StudentInfo {
+
+        val sp = getPreferences(Context.MODE_PRIVATE)
+        val studentInfoJson = sp.getString(STUDENT_INFO_SHARED_PREFS, "")
+
+        return when (studentInfoJson.isNullOrBlank()) {
+
+            true -> {
+                val studentInfo = getFakeStudentInfo()
+                saveStudentInfo(studentInfo)
+                studentInfo
+            }
+            false -> Gson().fromJson(studentInfoJson, StudentInfo::class.java)
+        }
+    }
+
+    private fun getFakeStudentInfo() = StudentInfo(
+        CourseType.FIRST,
+        InstitutionType.InFO,
+        StudentUnionType.NOT_IN_STUDENT_UNION
+    )
 }
