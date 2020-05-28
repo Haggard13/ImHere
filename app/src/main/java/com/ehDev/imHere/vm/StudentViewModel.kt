@@ -3,15 +3,22 @@ package com.ehDev.imHere.vm
 import android.Manifest
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.ehDev.imHere.data.filter.CourseType
+import com.ehDev.imHere.data.filter.InstitutionType
+import com.ehDev.imHere.data.filter.StudentInfo
+import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.UrfuRoomDatabase
 import com.ehDev.imHere.db.entity.InstitutionEntity
 import com.ehDev.imHere.db.entity.ScheduleEntity
 import com.ehDev.imHere.repository.InstitutionRepository
 import com.ehDev.imHere.repository.InterviewRepository
 import com.ehDev.imHere.repository.ScheduleRepository
+import com.ehDev.imHere.utils.STUDENT_INFO_SHARED_PREFS
+import com.google.gson.Gson
 
 class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
 
@@ -36,8 +43,8 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         scheduleRepository = ScheduleRepository(scheduleDao)
 
         val institutionDao = UrfuRoomDatabase.getDatabase(
-                context = app,
-                scope = viewModelScope
+            context = app,
+            scope = viewModelScope
         ).institutionDao()
 
         institutionRepository = InstitutionRepository(institutionDao)
@@ -60,5 +67,37 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         Manifest.permission.ACCESS_FINE_LOCATION
     )
 
-    suspend fun getInstitution(prefix: String) : InstitutionEntity = institutionRepository.getCoordinates(prefix)[0]
+    suspend fun getInstitution(prefix: String): InstitutionEntity = institutionRepository.getCoordinates(prefix).first()
+
+    fun loadSavedStudentInfo(): StudentInfo {
+
+        val sp = app.getSharedPreferences(STUDENT_INFO_SHARED_PREFS, Context.MODE_PRIVATE)
+        val studentInfoJson = sp.getString(STUDENT_INFO_SHARED_PREFS, "")
+
+        return when (studentInfoJson.isNullOrBlank()) {
+
+            true -> {
+                val studentInfo = getFakeStudentInfo()
+                saveStudentInfo(studentInfo)
+                studentInfo
+            }
+            false -> Gson().fromJson(studentInfoJson, StudentInfo::class.java)
+        }
+    }
+
+    private fun saveStudentInfo(studentInfo: StudentInfo) {
+
+        val sp = app.getSharedPreferences(STUDENT_INFO_SHARED_PREFS, Context.MODE_PRIVATE)
+        with(sp.edit()) {
+            val studentInfoJson = Gson().toJson(studentInfo)
+            putString(STUDENT_INFO_SHARED_PREFS, studentInfoJson)
+            apply()
+        }
+    }
+
+    private fun getFakeStudentInfo() = StudentInfo(
+        CourseType.FIRST,
+        InstitutionType.InFO,
+        StudentUnionType.NOT_IN_STUDENT_UNION
+    )
 }

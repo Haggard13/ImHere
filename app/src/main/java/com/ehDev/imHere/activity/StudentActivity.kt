@@ -25,16 +25,11 @@ import com.ehDev.imHere.R
 import com.ehDev.imHere.adapter.InterviewRecyclerViewAdapter
 import com.ehDev.imHere.adapter.ScheduleRecyclerViewAdapter
 import com.ehDev.imHere.data.VisitState
-import com.ehDev.imHere.data.filter.CourseType
-import com.ehDev.imHere.data.filter.InstitutionType
 import com.ehDev.imHere.data.filter.StudentInfo
-import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.asInt
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
-import com.ehDev.imHere.utils.STUDENT_INFO_SHARED_PREFS
 import com.ehDev.imHere.vm.StudentViewModel
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -109,7 +104,7 @@ class StudentActivity : AppCompatActivity() {
         classCardCreate()
         tabHostCreate()
 
-        listViewCreate(studentInfo = loadSavedStudentInfo())
+        listViewCreate(studentInfo = studentViewModel.loadSavedStudentInfo())
     }
 
     // todo: разнести логику
@@ -291,7 +286,7 @@ class StudentActivity : AppCompatActivity() {
         )
     }
 
-    private fun parseInstitutionName(auditorium: String) = auditorium.split('-')[0]
+    private fun parseInstitutionName(auditorium: String) = auditorium.split('-').first()
 
     private fun filterInterviewDate(interview: InterviewEntity): Boolean {
         // Тут по индексации из-за того что есть год идет смещение на одну позицию.
@@ -311,36 +306,4 @@ class StudentActivity : AppCompatActivity() {
         (studentInfo.course.isCourseCorrect(interview.course))
                 && (studentInfo.institution.isInstituteCorrect(interview.institution))
                 && (studentInfo.studentUnionInfo.isStudentUnionInfoCorrect(interview.studentUnionInfo))
-
-    private fun saveStudentInfo(studentInfo: StudentInfo) {
-
-        val sp = getPreferences(Context.MODE_PRIVATE)
-        with(sp.edit()) {
-            val studentInfoJson = Gson().toJson(studentInfo)
-            putString(STUDENT_INFO_SHARED_PREFS, studentInfoJson)
-            apply()
-        }
-    }
-
-    private fun loadSavedStudentInfo(): StudentInfo {
-
-        val sp = getPreferences(Context.MODE_PRIVATE)
-        val studentInfoJson = sp.getString(STUDENT_INFO_SHARED_PREFS, "")
-
-        return when (studentInfoJson.isNullOrBlank()) {
-
-            true -> {
-                val studentInfo = getFakeStudentInfo()
-                saveStudentInfo(studentInfo)
-                studentInfo
-            }
-            false -> Gson().fromJson(studentInfoJson, StudentInfo::class.java)
-        }
-    }
-
-    private fun getFakeStudentInfo() = StudentInfo(
-        CourseType.FIRST,
-        InstitutionType.InFO,
-        StudentUnionType.NOT_IN_STUDENT_UNION
-    )
 }
