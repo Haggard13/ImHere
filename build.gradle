@@ -35,5 +35,7 @@ ext {
     archLifecycleVersion = '2.2.0'
     coreTestingVersion = '2.1.0'
     materialVersion = '1.1.0'
-    coroutines = '1.3.4'
+    coroutinesVersion = '1.3.4'
+    gsonVersion = '2.8.5'
+    inputMaskVersion = '6.0.0'
 }
