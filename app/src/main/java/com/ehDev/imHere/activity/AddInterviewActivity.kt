@@ -19,7 +19,7 @@ import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.textAsString
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
-import com.ehDev.imHere.utils.DateMaskedTextChangedListenerImpl
+import com.ehDev.imHere.utils.DateMaskedTextChangedListener
 import com.ehDev.imHere.vm.AddInterviewViewModel
 import kotlinx.android.synthetic.main.activity_add_interview.*
 import kotlinx.coroutines.launch
@@ -37,13 +37,7 @@ class AddInterviewActivity : AppCompatActivity(),
 
         addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
 
-        val textChangedListener = DateMaskedTextChangedListenerImpl(interview_date_et)
-        interview_date_et.addTextChangedListener(textChangedListener)
-        interview_date_et.onFocusChangeListener = textChangedListener
-
-        courses_spinner.setSelection(0)
-        institutions_spinner.setSelection(0)
-        students_union_spinner.setSelection(0)
+        DateMaskedTextChangedListener().installListener(interview_date_et)
         setStateSpinner(false)
 
         all_students_switch.setOnCheckedChangeListener(this)
