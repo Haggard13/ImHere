@@ -39,7 +39,7 @@ class AddInterviewActivity : AppCompatActivity(),
         addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
 
         setupInterviewDateMask()
-        setStateSpinner(false)
+        setStateSpinner(all_students_switch.isChecked)
         all_students_switch.setOnCheckedChangeListener(this)
     }
 
