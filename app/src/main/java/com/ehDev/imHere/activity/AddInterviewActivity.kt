@@ -125,7 +125,7 @@ class AddInterviewActivity : AppCompatActivity(),
     }
 
     private fun String.isDateValid() = matches(Regex("""\d\d\.\d\d\.\d\d"""))
-        .not()
+        .not() //fixme: убрать,  для тестов сделано так
 
     //Получение фильтра для выбора получателей
     private fun getStudentFilter() = when (all_students_switch.isChecked) {
