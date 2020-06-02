@@ -15,8 +15,7 @@ class DateMaskedTextChangedListener {
             autocomplete = true,
             autoskip = false,
             editText = editText,
-            valueListener =
-            object : MaskedTextChangedListener.ValueListener {
+            valueListener = object : MaskedTextChangedListener.ValueListener {
 
                 override fun onTextChanged(maskFilled: Boolean, extractedValue: String, formattedValue: String) {
 
