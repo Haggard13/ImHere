@@ -80,7 +80,7 @@ class StudentActivity : AppCompatActivity() {
 
         studentViewModel = ViewModelProvider(this).get(StudentViewModel::class.java)
 
-        progressBar.visibility = View.INVISIBLE
+        location_progress_bar.visibility = View.INVISIBLE
 
         //region Location Block
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -120,7 +120,7 @@ class StudentActivity : AppCompatActivity() {
                 makeRequestLocationUpdate()
             }
 
-            progressBar.visibility = View.VISIBLE
+            location_progress_bar.visibility = View.VISIBLE
             check_btn.isClickable = false
 
             withContext(Dispatchers.IO) {
@@ -178,7 +178,7 @@ class StudentActivity : AppCompatActivity() {
 
             location_tv.text = formatLocation(locationStudent)
             wifi_tv.text = wifiMgr?.connectionInfo?.ssid
-            progressBar.visibility = View.INVISIBLE
+            location_progress_bar.visibility = View.INVISIBLE
             check_btn.isClickable = true
         }
     }
