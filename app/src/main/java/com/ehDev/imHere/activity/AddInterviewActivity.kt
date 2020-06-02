@@ -19,11 +19,13 @@ import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.textAsString
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.utils.DateMaskedTextChangedListenerImpl
 import com.ehDev.imHere.vm.AddInterviewViewModel
 import kotlinx.android.synthetic.main.activity_add_interview.*
 import kotlinx.coroutines.launch
 
-class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener {
+class AddInterviewActivity : AppCompatActivity(),
+    CompoundButton.OnCheckedChangeListener {
 
     private lateinit var addInterviewViewModel: AddInterviewViewModel
 
@@ -34,6 +36,10 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         setContentView(R.layout.activity_add_interview)
 
         addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
+
+        val textChangedListener = DateMaskedTextChangedListenerImpl(interview_date_et)
+        interview_date_et.addTextChangedListener(textChangedListener)
+        interview_date_et.onFocusChangeListener = textChangedListener
 
         courses_spinner.setSelection(0)
         institutions_spinner.setSelection(0)
@@ -102,7 +108,7 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         false -> setStateSpinner(true)
     }
 
-    private fun setStateSpinner(state: Boolean){
+    private fun setStateSpinner(state: Boolean) {
 
         courses_spinner.isEnabled = state
         institutions_spinner.isEnabled = state
@@ -114,7 +120,9 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
         val regexShort = Regex("""https://forms\.gle/.+""")
         val regexLong = Regex("""https://docs\.google\.com/forms/d/e/.+/viewform(\?usp=sf_link)?""")
-        return ((matches(regexShort) || matches(regexLong))) //&& URLUtil.isValidUrl(interviewReference)) Не пашет как надо
+        return ((matches(regexShort) || matches(
+            regexLong
+        ))) //&& URLUtil.isValidUrl(interviewReference)) Не пашет как надо
             .not() //fixme: убрать,  для тестов сделано так
     }
 
@@ -136,7 +144,9 @@ class AddInterviewActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         else -> StudentInfo(
             course = CourseType.findCourseByDescription(courses_spinner.selectedItem.toString()),
             institution = InstitutionType.findInstituteByDescription(institutions_spinner.selectedItem.toString()),
-            studentUnionInfo = StudentUnionType.findStudentUnionInfoByDescription(students_union_spinner.selectedItem.toString())
+            studentUnionInfo = StudentUnionType.findStudentUnionInfoByDescription(
+                students_union_spinner.selectedItem.toString()
+            )
         )
     }
 
