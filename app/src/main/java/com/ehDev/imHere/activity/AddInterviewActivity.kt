@@ -1,6 +1,5 @@
 package com.ehDev.imHere.activity
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
@@ -30,8 +29,6 @@ class AddInterviewActivity : AppCompatActivity(),
 
     private lateinit var addInterviewViewModel: AddInterviewViewModel
 
-    // TODO: разнести логику
-    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_interview)
@@ -97,7 +94,7 @@ class AddInterviewActivity : AppCompatActivity(),
         val sp = getSharedPreferences(AUTHENTICATION_SHARED_PREFS, Context.MODE_PRIVATE)
         sp.edit().clear().apply()
         startActivity(Intent(this, LoginActivity::class.java))
-        super@AddInterviewActivity.finish()
+        this.finish()
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) = when (isChecked) {
