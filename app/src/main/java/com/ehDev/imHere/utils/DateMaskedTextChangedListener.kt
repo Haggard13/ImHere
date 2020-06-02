@@ -1,31 +1,46 @@
 package com.ehDev.imHere.utils
 
 import android.widget.EditText
+import com.ehDev.imHere.extensions.isEnteredDateLessThanCurrent
 import com.redmadrobot.inputmask.MaskedTextChangedListener
-import java.text.SimpleDateFormat
-import java.util.Date
+import com.redmadrobot.inputmask.model.Notation
+
+private const val DATE_PATTERN = "dd.MM.yyyy"
+
+// https://github.com/RedMadRobot/input-mask-android/wiki/1.-Mask-Syntax
+private const val DATE_MASK = "[d][0]{.}[m][0]{.20}[00]"
 
 class DateMaskedTextChangedListener {
 
-    fun installListener(editText: EditText) {
+    fun installListener(editText: EditText, errorCallback: () -> Unit) {
 
         MaskedTextChangedListener.Companion.installOn(
 
-            primaryFormat = "[00]{.}[00]{.}[0000]",
+            primaryFormat = DATE_MASK,
             autocomplete = true,
-            autoskip = false,
+            autoskip = true,
             editText = editText,
+            customNotations = listOf(dayNotation, monthNotation),
             valueListener = object : MaskedTextChangedListener.ValueListener {
 
                 override fun onTextChanged(maskFilled: Boolean, extractedValue: String, formattedValue: String) {
 
                     if (maskFilled) {
-                        val pattern = "dd.MM.yyyy"
-                        val dateFormat = SimpleDateFormat(pattern)
-                        val date = dateFormat.format(Date())
+                        if (editText.isEnteredDateLessThanCurrent()) {
+                            errorCallback.invoke()
+                        }
                     }
                 }
             }
         )
     }
+
+    /**
+     * [dayNotation] - нужна, так как первое число даты не может быть больше 3
+     * [monthNotation] - нужна, так как первое число месяца не может быть больше 1
+     *
+     * https://github.com/RedMadRobot/input-mask-android/wiki/1.1-Custom-Notations
+     */
+    private val dayNotation = Notation('d', "0123", true)
+    private val monthNotation = Notation('m', "01", true)
 }

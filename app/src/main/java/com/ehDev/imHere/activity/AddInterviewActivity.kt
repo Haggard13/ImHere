@@ -17,6 +17,7 @@ import com.ehDev.imHere.data.filter.InstitutionType
 import com.ehDev.imHere.data.filter.StudentInfo
 import com.ehDev.imHere.data.filter.StudentUnionType
 import com.ehDev.imHere.db.entity.InterviewEntity
+import com.ehDev.imHere.extensions.isEnteredDateLessThanCurrent
 import com.ehDev.imHere.extensions.textAsString
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
 import com.ehDev.imHere.utils.DateMaskedTextChangedListener
@@ -37,19 +38,18 @@ class AddInterviewActivity : AppCompatActivity(),
 
         addInterviewViewModel = ViewModelProvider(this).get(AddInterviewViewModel::class.java)
 
-        DateMaskedTextChangedListener().installListener(interview_date_et)
+        setupInterviewDateMask()
         setStateSpinner(false)
-
         all_students_switch.setOnCheckedChangeListener(this)
     }
 
     fun onAddInterviewBtnClick(v: View) {
         addInterviewViewModel.viewModelScope.launch {
             val interviewReference = interview_reference_et.textAsString
-            val interviewTime = interview_date_et.textAsString
+            val interviewDate = interview_date_et.textAsString
 
             when {
-                interviewReference.isNullOrEmpty() -> {
+                interviewReference.isEmpty() -> {
                     showToast("Укажите ссылку")
                     return@launch
                 }
@@ -60,8 +60,12 @@ class AddInterviewActivity : AppCompatActivity(),
             }
 
             when {
-                interviewTime.isValidTime().not() -> {
-                    showToast("Неверный формат времени")
+                interviewDate.isDateValid().not() -> {
+                    showToast("Неверный формат даты")
+                    return@launch
+                }
+                interview_date_et.isEnteredDateLessThanCurrent() -> {
+                    showToast("Дата не должна быть раньше текущей")
                     return@launch
                 }
             }
@@ -120,12 +124,8 @@ class AddInterviewActivity : AppCompatActivity(),
             .not() //fixme: убрать,  для тестов сделано так
     }
 
-    private fun String.isValidTime(): Boolean {
-
-        val regex = Regex("""\d\d/\d\d/\d\d \d\d:\d\d""")
-        return matches(regex)
-            .not()
-    }
+    private fun String.isDateValid() = matches(Regex("""\d\d\.\d\d\.\d\d"""))
+        .not()
 
     //Получение фильтра для выбора получателей
     private fun getStudentFilter() = when (all_students_switch.isChecked) {
@@ -142,6 +142,10 @@ class AddInterviewActivity : AppCompatActivity(),
                 students_union_spinner.selectedItem.toString()
             )
         )
+    }
+
+    private fun setupInterviewDateMask() = DateMaskedTextChangedListener().installListener(interview_date_et) {
+        showToast("Дата не должна быть раньше текущей")
     }
 
     private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
