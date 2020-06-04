@@ -31,6 +31,7 @@ import com.ehDev.imHere.data.filter.StudentInfo
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.asInt
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.utils.location.ConnectionCallbacksImpl
 import com.ehDev.imHere.utils.location.OnLocationFailedListenerImpl
 import com.ehDev.imHere.vm.StudentViewModel
 import com.google.android.gms.common.ConnectionResult
@@ -61,8 +62,7 @@ private const val PLAY_SERVICES_RESOLUTION_REQUEST = 1234
 private const val UPDATE_INTERVAL: Long = 5000
 private const val FASTEST_INTERVAL: Long = 5000
 
-class StudentActivity : AppCompatActivity(),
-    GoogleApiClient.ConnectionCallbacks {
+class StudentActivity : AppCompatActivity() {
 
     private var locationRequest: LocationRequest? = null
     private var studentLocation: Location? = null
@@ -93,7 +93,7 @@ class StudentActivity : AppCompatActivity(),
 
         googleApiClient = GoogleApiClient.Builder(this)
             .addApi(LocationServices.API)
-            .addConnectionCallbacks(this)
+            .addConnectionCallbacks(ConnectionCallbacksImpl(::tryToConnectGPSServices))
             .addOnConnectionFailedListener(
                 OnLocationFailedListenerImpl { showToast("Обнаружены проблемы с интернетом") }
             )
@@ -355,12 +355,6 @@ class StudentActivity : AppCompatActivity(),
         }
     }
 
-    override fun onConnectionSuspended(p0: Int) {
-        showToast("suspended")
-    }
-
-    override fun onConnected(bundle: Bundle?) = tryToConnectGPSServices()
-
     private fun tryToConnectGPSServices() {
 
         if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
@@ -370,7 +364,9 @@ class StudentActivity : AppCompatActivity(),
         LocationServices.getFusedLocationProviderClient(this)
             .requestLocationUpdates(locationRequest, object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult?) {
-                    showToast("location got? longitude: ${result?.lastLocation?.latitude}, latitude: ${result?.lastLocation?.latitude}")
+                    showToast(
+                        "location got? longitude: ${result?.lastLocation?.latitude}, latitude: ${result?.lastLocation?.latitude}"
+                    )
                     result?.let { studentLocation = it.lastLocation }
                 }
             }, null)
@@ -388,7 +384,6 @@ class StudentActivity : AppCompatActivity(),
             interval = UPDATE_INTERVAL
             fastestInterval = FASTEST_INTERVAL
         }
-
 
         val builder = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest!!)
@@ -430,7 +425,9 @@ class StudentActivity : AppCompatActivity(),
 
         LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location: Location? ->
             location?.let { it: Location ->
-                showToast("location updated? longitude: ${it.longitude}, latitude: ${it.latitude}") // todo: порефакторить
+                showToast(
+                    "location updated? longitude: ${it.longitude}, latitude: ${it.latitude}"
+                ) // todo: порефакторить
                 studentLocation = it
             } ?: run {
                 showToast("location failed?") // todo: порефакторить
@@ -446,7 +443,8 @@ class StudentActivity : AppCompatActivity(),
                     showToast("onActivityResult: GPS Enabled by user")
                 Activity.RESULT_CANCELED ->                 // The user was asked to change settings, but chose not to
                     showToast("onActivityResult: User rejected GPS request")
-                else -> {}
+                else -> {
+                }
             }
         }
     }
@@ -455,12 +453,14 @@ class StudentActivity : AppCompatActivity(),
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action!!.matches(Regex("android.location.PROVIDERS_CHANGED"))) {
 
-                val locationManager: LocationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val locationManager: LocationManager =
+                    context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
                 if (isGpsEnabled) {
                     tryToConnectGPSServices()
-                } else {
+                }
+                else {
                     showToast("без GPS приложение может работать неверно")
                 }
             }
