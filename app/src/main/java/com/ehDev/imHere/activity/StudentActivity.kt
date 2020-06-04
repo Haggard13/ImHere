@@ -31,6 +31,7 @@ import com.ehDev.imHere.data.filter.StudentInfo
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.asInt
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.utils.location.OnLocationFailedListenerImpl
 import com.ehDev.imHere.vm.StudentViewModel
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -61,8 +62,7 @@ private const val UPDATE_INTERVAL: Long = 5000
 private const val FASTEST_INTERVAL: Long = 5000
 
 class StudentActivity : AppCompatActivity(),
-    GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener {
+    GoogleApiClient.ConnectionCallbacks {
 
     private var locationRequest: LocationRequest? = null
     private var studentLocation: Location? = null
@@ -94,7 +94,9 @@ class StudentActivity : AppCompatActivity(),
         googleApiClient = GoogleApiClient.Builder(this)
             .addApi(LocationServices.API)
             .addConnectionCallbacks(this)
-            .addOnConnectionFailedListener(this)
+            .addOnConnectionFailedListener(
+                OnLocationFailedListenerImpl { showToast("Обнаружены проблемы с интернетом") }
+            )
             .build()
 
         classCardCreate()
@@ -355,10 +357,6 @@ class StudentActivity : AppCompatActivity(),
 
     override fun onConnectionSuspended(p0: Int) {
         showToast("suspended")
-    }
-
-    override fun onConnectionFailed(p0: ConnectionResult) {
-        showToast("failed")
     }
 
     override fun onConnected(bundle: Bundle?) = tryToConnectGPSServices()
