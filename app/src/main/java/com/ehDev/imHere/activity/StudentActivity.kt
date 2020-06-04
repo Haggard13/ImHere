@@ -31,6 +31,7 @@ import com.ehDev.imHere.data.filter.StudentInfo
 import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.asInt
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
+import com.ehDev.imHere.utils.GpsSwitchBroadcastReceiver
 import com.ehDev.imHere.utils.location.ConnectionCallbacksImpl
 import com.ehDev.imHere.utils.location.OnLocationFailedListenerImpl
 import com.ehDev.imHere.vm.StudentViewModel
@@ -64,6 +65,12 @@ private const val FASTEST_INTERVAL: Long = 5000
 
 class StudentActivity : AppCompatActivity() {
 
+    private val gpsBroadcastReceiver by lazy {
+        GpsSwitchBroadcastReceiver(
+            onGPSEnabledAction = ::tryToConnectGPSServices,
+            onGPSDisabledAction = { showToast("без GPS приложение может работать неверно") }
+        )
+    }
     private var locationRequest: LocationRequest? = null
     private var studentLocation: Location? = null
     private val permissions: MutableList<String> = mutableListOf()
@@ -291,10 +298,8 @@ class StudentActivity : AppCompatActivity() {
         return result
     }
 
-    private fun hasPermission(permission: String): Boolean {
-
-        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun hasPermission(permission: String): Boolean =
+        ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
     override fun onRequestPermissionsResult(requestCode: Int, perms: Array<out String>, grantResults: IntArray) {
 
@@ -348,7 +353,7 @@ class StudentActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        registerReceiver(mGpsSwitchStateReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
+        registerReceiver(gpsBroadcastReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
 
         if (checkPlayServices().not()) {
             showToast("Нужно установить Google Play Services")
@@ -385,9 +390,7 @@ class StudentActivity : AppCompatActivity() {
             fastestInterval = FASTEST_INTERVAL
         }
 
-        val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest!!)
-// todo: порефакторить
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest!!)
         val locationTask = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build())
         locationTask.addOnCompleteListener {
 
@@ -397,22 +400,12 @@ class StudentActivity : AppCompatActivity() {
                 // requests here.
             } catch (exception: ApiException) {
                 when (exception.statusCode) {
-                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->                             // Location settings are not satisfied. But could be fixed by showing the
-                        // user a dialog.
-                        try {
-                            // Cast to a resolvable exception.
-                            val resolvable: ResolvableApiException = exception as ResolvableApiException
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            resolvable.startResolutionForResult(
-                                this,
-                                LocationRequest.PRIORITY_HIGH_ACCURACY
-                            )
-                        } catch (e: IntentSender.SendIntentException) {
-                            // Ignore the error.
-                        } catch (e: ClassCastException) {
-                            // Ignore, should be an impossible error.
-                        }
+                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+
+                        val resolvable: ResolvableApiException = exception as ResolvableApiException
+                        // Показываем диалог с помощью startResolutionForResult()
+                        resolvable.startResolutionForResult(this, LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    }
                     LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
                     }
                 }
@@ -423,45 +416,26 @@ class StudentActivity : AppCompatActivity() {
             showToast("You need to enable permissions to display location !") // todo: порефакторить
         }
 
-        LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location: Location? ->
-            location?.let { it: Location ->
-                showToast(
-                    "location updated? longitude: ${it.longitude}, latitude: ${it.latitude}"
-                ) // todo: порефакторить
-                studentLocation = it
-            } ?: run {
-                showToast("location failed?") // todo: порефакторить
+        LocationServices.getFusedLocationProviderClient(this).lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let { it: Location ->
+                    showToast(
+                        "location updated? longitude: ${it.longitude}, latitude: ${it.latitude}"
+                    ) // todo: порефакторить
+                    studentLocation = it
+                } ?: run {
+                    showToast("location failed?") // todo: порефакторить
+                }
             }
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             LocationRequest.PRIORITY_HIGH_ACCURACY -> when (resultCode) {
-                Activity.RESULT_OK ->                 // All required changes were successfully made
-                    showToast("onActivityResult: GPS Enabled by user")
-                Activity.RESULT_CANCELED ->                 // The user was asked to change settings, but chose not to
-                    showToast("onActivityResult: User rejected GPS request")
+                Activity.RESULT_OK -> showToast("onActivityResult: GPS Enabled by user")
+                Activity.RESULT_CANCELED -> showToast("onActivityResult: User rejected GPS request")
                 else -> {
-                }
-            }
-        }
-    }
-
-    private val mGpsSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            if (intent.action!!.matches(Regex("android.location.PROVIDERS_CHANGED"))) {
-
-                val locationManager: LocationManager =
-                    context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-
-                if (isGpsEnabled) {
-                    tryToConnectGPSServices()
-                }
-                else {
-                    showToast("без GPS приложение может работать неверно")
                 }
             }
         }
