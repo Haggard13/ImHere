@@ -2,11 +2,16 @@ package com.ehDev.imHere.activity
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import android.content.IntentFilter
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -29,9 +34,16 @@ import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
 import com.ehDev.imHere.vm.StudentViewModel
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -120,7 +132,7 @@ class StudentActivity : AppCompatActivity(),
 
                 currentPair.visit == VisitState.VISITED.name -> "Вы уже отметились"
 
-//                currentPair.date.toGregorianCalendar() > currentDate -> "Пара еще не началась"
+                currentPair.date.toGregorianCalendar() > currentDate -> "Пара еще не началась"
 
                 else -> {
                     val institutionName = parseInstitutionName(currentPair.auditorium)
@@ -334,6 +346,8 @@ class StudentActivity : AppCompatActivity(),
     override fun onResume() {
         super.onResume()
 
+        registerReceiver(mGpsSwitchStateReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
+
         if (checkPlayServices().not()) {
             showToast("Нужно установить Google Play Services")
         }
@@ -347,13 +361,22 @@ class StudentActivity : AppCompatActivity(),
         showToast("failed")
     }
 
-    override fun onConnected(bundle: Bundle?) {
+    override fun onConnected(bundle: Bundle?) = tryToConnectGPSServices()
+
+    private fun tryToConnectGPSServices() {
+
         if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
             return
         }
+// todo: порефакторить
+        LocationServices.getFusedLocationProviderClient(this)
+            .requestLocationUpdates(locationRequest, object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult?) {
+                    showToast("location got? longitude: ${result?.lastLocation?.latitude}, latitude: ${result?.lastLocation?.latitude}")
+                    result?.let { studentLocation = it.lastLocation }
+                }
+            }, null)
 
-        // Permissions ok, we get last location
-        studentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
         if (studentLocation != null) {
             showToast("longitude: ${studentLocation?.longitude}, latitude: ${studentLocation?.latitude}")
         }
@@ -368,11 +391,81 @@ class StudentActivity : AppCompatActivity(),
             fastestInterval = FASTEST_INTERVAL
         }
 
-        if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
-            showToast("You need to enable permissions to display location !")
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest!!)
+// todo: порефакторить
+        val locationTask = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build())
+        locationTask.addOnCompleteListener {
+
+            try {
+                val response: LocationSettingsResponse? = locationTask.getResult(ApiException::class.java)
+                // All location settings are satisfied. The client can initialize location
+                // requests here.
+            } catch (exception: ApiException) {
+                when (exception.statusCode) {
+                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->                             // Location settings are not satisfied. But could be fixed by showing the
+                        // user a dialog.
+                        try {
+                            // Cast to a resolvable exception.
+                            val resolvable: ResolvableApiException = exception as ResolvableApiException
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            resolvable.startResolutionForResult(
+                                this,
+                                LocationRequest.PRIORITY_HIGH_ACCURACY
+                            )
+                        } catch (e: IntentSender.SendIntentException) {
+                            // Ignore the error.
+                        } catch (e: ClassCastException) {
+                            // Ignore, should be an impossible error.
+                        }
+                    LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
+                    }
+                }
+            }
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest) {
-            // сюда можно добавить действие на изменение локации
+
+        if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
+            showToast("You need to enable permissions to display location !") // todo: порефакторить
+        }
+
+        LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location: Location? ->
+            location?.let { it: Location ->
+                showToast("location updated? longitude: ${it.longitude}, latitude: ${it.latitude}") // todo: порефакторить
+                studentLocation = it
+            } ?: run {
+                showToast("location failed?") // todo: порефакторить
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            LocationRequest.PRIORITY_HIGH_ACCURACY -> when (resultCode) {
+                Activity.RESULT_OK ->                 // All required changes were successfully made
+                    showToast("onActivityResult: GPS Enabled by user")
+                Activity.RESULT_CANCELED ->                 // The user was asked to change settings, but chose not to
+                    showToast("onActivityResult: User rejected GPS request")
+                else -> {}
+            }
+        }
+    }
+
+    private val mGpsSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            if (intent.action!!.matches(Regex("android.location.PROVIDERS_CHANGED"))) {
+
+                val locationManager: LocationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+                if (isGpsEnabled) {
+                    tryToConnectGPSServices()
+                } else {
+                    showToast("без GPS приложение может работать неверно")
+                }
+            }
         }
     }
 }
