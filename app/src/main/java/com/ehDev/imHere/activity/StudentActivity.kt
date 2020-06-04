@@ -30,7 +30,6 @@ import com.ehDev.imHere.vm.StudentViewModel
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.student_main.*
@@ -51,8 +50,7 @@ private const val FASTEST_INTERVAL: Long = 5000
 
 class StudentActivity : AppCompatActivity(),
     GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener,
-    LocationListener {
+    GoogleApiClient.OnConnectionFailedListener {
 
     private var locationRequest: LocationRequest? = null
     private var studentLocation: Location? = null
@@ -349,11 +347,6 @@ class StudentActivity : AppCompatActivity(),
         showToast("failed")
     }
 
-    override fun onLocationChanged(location: Location?) {
-//        location ?: return
-//        showToast("longitude: ${location.longitude}, latitude: ${location.latitude}")
-    }
-
     override fun onConnected(bundle: Bundle?) {
         if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
             return
@@ -378,6 +371,8 @@ class StudentActivity : AppCompatActivity(),
         if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
             showToast("You need to enable permissions to display location !")
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this)
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest) {
+            // сюда можно добавить действие на изменение локации
+        }
     }
 }
