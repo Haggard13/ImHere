@@ -59,7 +59,7 @@ object FakeDataHolder {
 
     //region Расписание
     var date = arrayOf(
-        "5, 25, 12, 00",
+        "6, 4, 12, 00",
         "5, 26, 8, 30",
         "5, 26, 10, 15",
         "5, 26, 12, 00",
@@ -124,5 +124,4 @@ object FakeDataHolder {
         "Алгебра и геометрия",
         "Программирование"
     )
-    //endregion
 }
