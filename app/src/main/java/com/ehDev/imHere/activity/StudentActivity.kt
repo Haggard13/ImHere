@@ -3,12 +3,10 @@ package com.ehDev.imHere.activity
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.content.IntentFilter
-import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
@@ -17,7 +15,6 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.URLUtil
 import android.widget.TabHost.TabSpec
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -32,21 +29,10 @@ import com.ehDev.imHere.db.entity.InterviewEntity
 import com.ehDev.imHere.extensions.asInt
 import com.ehDev.imHere.utils.AUTHENTICATION_SHARED_PREFS
 import com.ehDev.imHere.utils.GpsSwitchBroadcastReceiver
-import com.ehDev.imHere.utils.location.ConnectionCallbacksImpl
-import com.ehDev.imHere.utils.location.OnLocationFailedListenerImpl
 import com.ehDev.imHere.vm.StudentViewModel
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsResponse
-import com.google.android.gms.location.LocationSettingsStatusCodes
 import kotlinx.android.synthetic.main.student_main.*
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -60,23 +46,19 @@ private const val MINUTES = 3
 private const val ALL_PERMISSIONS_RESULT = 1011
 private const val PLAY_SERVICES_RESOLUTION_REQUEST = 1234
 
-private const val UPDATE_INTERVAL: Long = 5000
-private const val FASTEST_INTERVAL: Long = 5000
-
 class StudentActivity : AppCompatActivity() {
 
-    private val gpsBroadcastReceiver by lazy {
-        GpsSwitchBroadcastReceiver(
-            onGPSEnabledAction = ::tryToConnectGPSServices,
-            onGPSDisabledAction = { showToast("без GPS приложение может работать неверно") }
-        )
-    }
-    private var locationRequest: LocationRequest? = null
-    private var studentLocation: Location? = null
+    private val gpsBroadcastReceiver = GpsSwitchBroadcastReceiver(
+        onGPSEnabledAction = { locationFacade.tryToConnectGPSServices() },
+        onGPSDisabledAction = { studentViewModel.showToast("без GPS приложение может работать неверно") }
+    )
+
     private val permissions: MutableList<String> = mutableListOf()
     private val permissionsRejected: MutableList<String> = mutableListOf()
 
-    private var googleApiClient: GoogleApiClient? = null
+    private val locationFacade by lazy {
+        studentViewModel.getLocationFacade(this)
+    }
 
     private lateinit var studentViewModel: StudentViewModel
 
@@ -98,14 +80,6 @@ class StudentActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, permissions.toTypedArray(), ALL_PERMISSIONS_RESULT)
         }
 
-        googleApiClient = GoogleApiClient.Builder(this)
-            .addApi(LocationServices.API)
-            .addConnectionCallbacks(ConnectionCallbacksImpl(::tryToConnectGPSServices))
-            .addOnConnectionFailedListener(
-                OnLocationFailedListenerImpl { showToast("Обнаружены проблемы с интернетом") }
-            )
-            .build()
-
         classCardCreate()
         tabHostCreate()
 
@@ -115,10 +89,6 @@ class StudentActivity : AppCompatActivity() {
     // todo: разнести логику
     fun onCheckBtnClick(v: View) {
         studentViewModel.viewModelScope.launch {
-
-//
-//            location_progress_bar.visibility = View.VISIBLE
-//            check_btn.isClickable = false
 
             val currentDateStringList = currentDate.asStringList()
             val fakeDate = getFakeDate(currentDateStringList)
@@ -151,19 +121,19 @@ class StudentActivity : AppCompatActivity() {
                         latitude = institution.latitude
                         longitude = institution.longitude
                     }
-                    when (studentLocation!!.distanceTo(locationInst) <= 100) {
+                    when (locationFacade.studentLocation!!.distanceTo(locationInst) <= 100) {
                         true -> {
-                            studentViewModel.changeState(currentPair.date)
-                            "ЗНАНИЕ - СИЛА"
+//                            studentViewModel.changeState(currentPair.date) // fixme
+                            "Вы отметились"
                         }
-                        false -> "СРОЧНО НА ПАРУ"
+                        false -> "Вы находитесь далеко от института"
                     }
                 }
             }
 
-            showToast(toastText)
+            studentViewModel.showToast(toastText)
 
-            location_tv.text = formatLocation(studentLocation)
+            location_tv.text = formatLocation(locationFacade.studentLocation)
             location_progress_bar.visibility = View.INVISIBLE
             check_btn.isClickable = true
         }
@@ -231,8 +201,6 @@ class StudentActivity : AppCompatActivity() {
     private fun String.isValidUrl() = URLUtil.isValidUrl(this)
     //.not() // fixme: нужно убрать not(). Оставляю пока, чтобы тестить было легче
 
-    private fun showToast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
-
     private fun getFakeDate(date: List<String>): String = when ((date[MINUTES]).asInt() < 30) {
 
         true -> "${date[MONTH]}, ${date[DAY]}, ${date[HOURS].asInt() - 2}, ${date[MINUTES].asInt() + 30}"
@@ -286,21 +254,6 @@ class StudentActivity : AppCompatActivity() {
                 && (studentInfo.institution.isInstituteCorrect(interview.institution))
                 && (studentInfo.studentUnionInfo.isStudentUnionInfoCorrect(interview.studentUnionInfo))
 
-    // Не работает с runtime permissions. Лень чекать на какой версии надо проверять,
-    // так что пусть пока будет unused
-    private fun permissionsToRequest(wantedPermissions: List<String>): List<String> {
-        val result: ArrayList<String> = ArrayList()
-        for (perm in wantedPermissions) {
-            if (hasPermission(perm).not()) {
-                result.add(perm)
-            }
-        }
-        return result
-    }
-
-    private fun hasPermission(permission: String): Boolean =
-        ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
-
     override fun onRequestPermissionsResult(requestCode: Int, perms: Array<out String>, grantResults: IntArray) {
 
         when (requestCode) {
@@ -313,7 +266,7 @@ class StudentActivity : AppCompatActivity() {
                 }
 
                 if (permissionsRejected.size > 0) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissionsRejected[0])) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissionsRejected.first())) {
 
                         AlertDialog.Builder(this).setMessage(
                             "Без этих разрешений приложение будет неработоспособным"
@@ -327,8 +280,8 @@ class StudentActivity : AppCompatActivity() {
                     }
                 }
                 else {
-                    if (googleApiClient != null) {
-                        googleApiClient!!.connect()
+                    if (locationFacade.googleApiClient != null) {
+                        locationFacade.googleApiClient!!.connect()
                     }
                 }
             }
@@ -356,88 +309,22 @@ class StudentActivity : AppCompatActivity() {
         registerReceiver(gpsBroadcastReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
 
         if (checkPlayServices().not()) {
-            showToast("Нужно установить Google Play Services")
+            studentViewModel.showToast("Нужно установить Google Play Services")
         }
-    }
-
-    private fun tryToConnectGPSServices() {
-
-        if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
-            return
-        }
-// todo: порефакторить
-        LocationServices.getFusedLocationProviderClient(this)
-            .requestLocationUpdates(locationRequest, object : LocationCallback() {
-                override fun onLocationResult(result: LocationResult?) {
-                    showToast(
-                        "location got? longitude: ${result?.lastLocation?.latitude}, latitude: ${result?.lastLocation?.latitude}"
-                    )
-                    result?.let { studentLocation = it.lastLocation }
-                }
-            }, null)
-
-        if (studentLocation != null) {
-            showToast("longitude: ${studentLocation?.longitude}, latitude: ${studentLocation?.latitude}")
-        }
-        startLocationUpdates()
-    }
-
-    private fun startLocationUpdates() {
-
-        locationRequest = LocationRequest().apply {
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = UPDATE_INTERVAL
-            fastestInterval = FASTEST_INTERVAL
-        }
-
-        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest!!)
-        val locationTask = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build())
-        locationTask.addOnCompleteListener {
-
-            try {
-                val response: LocationSettingsResponse? = locationTask.getResult(ApiException::class.java)
-                // All location settings are satisfied. The client can initialize location
-                // requests here.
-            } catch (exception: ApiException) {
-                when (exception.statusCode) {
-                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-
-                        val resolvable: ResolvableApiException = exception as ResolvableApiException
-                        // Показываем диалог с помощью startResolutionForResult()
-                        resolvable.startResolutionForResult(this, LocationRequest.PRIORITY_HIGH_ACCURACY)
-                    }
-                    LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
-                    }
-                }
-            }
-        }
-
-        if ((hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)).not()) {
-            showToast("You need to enable permissions to display location !") // todo: порефакторить
-        }
-
-        LocationServices.getFusedLocationProviderClient(this).lastLocation
-            .addOnSuccessListener { location: Location? ->
-                location?.let { it: Location ->
-                    showToast(
-                        "location updated? longitude: ${it.longitude}, latitude: ${it.latitude}"
-                    ) // todo: порефакторить
-                    studentLocation = it
-                } ?: run {
-                    showToast("location failed?") // todo: порефакторить
-                }
-            }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             LocationRequest.PRIORITY_HIGH_ACCURACY -> when (resultCode) {
-                Activity.RESULT_OK -> showToast("onActivityResult: GPS Enabled by user")
-                Activity.RESULT_CANCELED -> showToast("onActivityResult: User rejected GPS request")
+                Activity.RESULT_OK -> studentViewModel.showToast("onActivityResult: GPS Enabled by user")
+                Activity.RESULT_CANCELED -> studentViewModel.showToast("onActivityResult: User rejected GPS request")
                 else -> {
                 }
             }
         }
     }
+
+    private fun hasPermission(permission: String): Boolean =
+        ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 }

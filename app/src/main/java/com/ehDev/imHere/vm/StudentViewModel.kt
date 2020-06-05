@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,7 @@ import com.ehDev.imHere.db.entity.InstitutionEntity
 import com.ehDev.imHere.db.entity.ScheduleEntity
 import com.ehDev.imHere.repository.InstitutionRepository
 import com.ehDev.imHere.repository.InterviewRepository
+import com.ehDev.imHere.repository.LocationFacade
 import com.ehDev.imHere.repository.ScheduleRepository
 import com.ehDev.imHere.utils.STUDENT_INFO_SHARED_PREFS
 import com.google.gson.Gson
@@ -25,6 +27,12 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
     private val interviewRepository: InterviewRepository
     private val scheduleRepository: ScheduleRepository
     private val institutionRepository: InstitutionRepository
+
+    fun getLocationFacade(activity: Activity) = LocationFacade(
+        activity = activity,
+        context = app,
+        showToastCallback = { showToast(it) }
+    )
 
     init {
 
@@ -100,4 +108,5 @@ class StudentViewModel(private val app: Application) : AndroidViewModel(app) {
         InstitutionType.InFO,
         StudentUnionType.NOT_IN_STUDENT_UNION
     )
-}
+
+    fun showToast(text: String) = Toast.makeText(app, text, Toast.LENGTH_LONG).show()}
